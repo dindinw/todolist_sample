@@ -23,9 +23,9 @@ The Evolution
 
     Java ->  Mutiple languages in JVM, Groovy and Scala 
 
-    Spring -> Keep in evolution.
+    Spring -> Keep in evolution. 4.0 support: groovy, java8(lambda), websocket(jsr356,STOMP)
 
-    JSP/JSF -> dead -> CSS3, HTML5, Javascript: Bootscript, websocket
+    JSP/JSF -> not popular -> CSS3, HTML5, Javascript: Bootscript, websocket
     (World like JSON more and more.)
 
     JavaScript 
