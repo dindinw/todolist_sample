@@ -4,11 +4,14 @@
   <artifactId>todolist</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <dependencies>
-  	<dependency>
-  		<groupId>org.apache.maven.plugins</groupId>
-  		<artifactId>maven-compiler-plugin</artifactId>
-  		<version>3.1</version>
-  		<type>maven-plugin</type>
-  	</dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.1</version>
+        </plugin>
+    </plugins>
+  </build>
 </project>
