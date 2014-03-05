@@ -7,8 +7,34 @@ package io.dindinw.todolist.domain;
  * 
  */
 public class ToDo {
+    
     private Long id;
     private String name;
     private String description;
     private Boolean compeleted;
+    
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public Boolean isCompeleted() {
+        return compeleted;
+    }
+    public void setCompeleted(Boolean compeleted) {
+        this.compeleted = compeleted;
+    }
 }
