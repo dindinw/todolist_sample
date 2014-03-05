@@ -3,6 +3,10 @@ todolist Classic
 
 The Classic Java Web App. 
 
+JAVAEE-API
+----------
+
+ - 7.0 for web socket support, jetty 9.1 required.
 
 Maven
 -----
