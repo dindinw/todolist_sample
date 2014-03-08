@@ -15,25 +15,27 @@ public class ToDoListServerEndpoint {
      * @param msg
      */
     @OnMessage
-    public void onMessageComing(String msg, Session session){
+    public void processMessageFromClient(final String msg, final Session session){
+        System.out.println("Message came from the client ! " + msg);
         
     }
     
     /**
-     * Method to be called when a new web socket session is open.
+     * Method to be called when a new web socket session is open on server side.
      * @param session
      */
     @OnOpen
-    public void onSessionOpen(Session openSession){
-        
+    public void onServerSideSessionOpen(final Session openSession){
+        System.out.println("The Session is open at the server side " + openSession);
     }
     
     /**
-     * Method to be called when a web socket session is closing
+     * Method to be called when a web socket session is closing on server side.
      * @param closeSession
      */
     @OnClose
-    public void onSessionClose(Session closingSession){
+    public void onServerSideSessionClose(final Session closingSession){
+        System.out.println("The Session is closing at the server side " + closingSession);
         
     }
     
