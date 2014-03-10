@@ -22,9 +22,24 @@ maven-compiler-plugin
   - 2.3.2 04-Aug-2011
   - 3.1   07-Apr-2013
 
-jetty-maven-plugin
+Jetty
+-----
 
-  - latest 9.1.3.v20140225 (Maven 3 and Java 1.7 required.) [doc][jettydoc].       
+latest version : 9.1.3.v20140225 
 
+### jetty-server
 
-[jettydoc]:http://www.eclipse.org/jetty/documentation/current/jetty-maven-plugin.html
+### jetty-webapp
+
+### javax-websocket-server-impl
+
+ - The jsr356 impl
+
+### jetty-maven-plugin
+
+ - Maven 3 and Java 1.7 required.
+ 
+ - see doc [here][jettymaven] .       
+
+[jettymaven]:http://www.eclipse.org/jetty/documentation/current/jetty-maven-plugin.html
+
