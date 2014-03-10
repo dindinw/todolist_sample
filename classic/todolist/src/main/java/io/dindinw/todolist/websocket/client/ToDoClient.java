@@ -8,16 +8,9 @@ import javax.websocket.WebSocketContainer;
 
 public class ToDoClient {
     
-    final public String todoListWsUri = "ws://localhost:8080/todolist"; 
-    
-    private WebSocketContainer container;
-    
-    public ToDoClient(){
+    public static void main(String[] args) throws Exception {
         
-    }
-    
-    public void sendMsg(Object Msg) throws Exception{
-        
+        final String todoListWsUri = "ws://localhost:8080/todolist"; 
         // Depends on the ServiceLoader (ask for META-INF/services/javax.websocket.ContainerProvider file contains impl classes)
         
         // jetty : org.eclipse.jetty.websocket.jsr356.JettyClientContainerProvider
@@ -28,7 +21,7 @@ public class ToDoClient {
         
         // or with the help from spring to inject a container? instead of fixed to a single impl?
         
-        container = ContainerProvider.getWebSocketContainer();   
+        final WebSocketContainer container = ContainerProvider.getWebSocketContainer();   
          
         // In Jetty's impl:
         //    org.eclipse.jetty.websocket.jsr356.ClientContainer
@@ -48,7 +41,5 @@ public class ToDoClient {
         // 2.) sendText is the simplest method, 
         // 3.) sendObject() method is Encoder/Decoder required, otherwise error thrown.
         session.getBasicRemote().sendText("Hello");
-        
     }
-
 }
