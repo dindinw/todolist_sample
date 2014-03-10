@@ -1,4 +1,4 @@
-package io.dindinw.todolist.websocket;
+package io.dindinw.todolist.websocket.client;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.OnClose;
