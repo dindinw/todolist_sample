@@ -6,9 +6,14 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MarkerFactory;
+
 @ServerEndpoint(value="/todolist")
 public class ToDoListServerEndpoint {
-
+    
+    private final static Logger LOGGER = LoggerFactory.getLogger(ToDoListServerEndpoint.class);
     /**
      * Method to receive incoming web socket messages
      * Each websocket endpoint only have one message handling method
@@ -16,8 +21,7 @@ public class ToDoListServerEndpoint {
      */
     @OnMessage
     public void processMessageFromClient(final String msg, final Session session){
-        System.out.println("Message came from the client ! " + msg);
-        
+        LOGGER.info("Message '{}' came from the client ! ", msg);        
     }
     
     /**
@@ -26,7 +30,7 @@ public class ToDoListServerEndpoint {
      */
     @OnOpen
     public void onServerSideSessionOpen(final Session openSession){
-        System.out.println("The Session is open at the server side " + openSession);
+        LOGGER.info("The Session is open at the server side " + openSession);
     }
     
     /**
@@ -35,7 +39,7 @@ public class ToDoListServerEndpoint {
      */
     @OnClose
     public void onServerSideSessionClose(final Session closingSession){
-        System.out.println("The Session is closing at the server side " + closingSession);
+        LOGGER.info("The Session is closing at the server side " + closingSession);
         
     }
     

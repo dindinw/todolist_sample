@@ -6,12 +6,16 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @ClientEndpoint
 public class ToDoListClientEndpoint {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ToDoListClientEndpoint.class);
     
     @OnMessage
     public void processMessageFromServer(String msg, Session session) {
-        System.out.println("Message came from the server ! " + msg);
+        LOGGER.info("Message came from the server ! " + msg);
     }
     
     /**
@@ -20,7 +24,7 @@ public class ToDoListClientEndpoint {
      */
     @OnOpen
     public void onClientSideSessionOpen(final Session openSession){
-        System.out.println("The Session is open at the client side " + openSession);
+        LOGGER.info("The Session is open at the client side " + openSession);
     }
     
     /**
@@ -29,7 +33,7 @@ public class ToDoListClientEndpoint {
      */
     @OnClose
     public void onClientSideSessionClose(final Session closingSession){
-        System.out.println("The Session is closing at the client side " + closingSession);
+        LOGGER.info("The Session is closing at the client side " + closingSession);
         
     }
 
