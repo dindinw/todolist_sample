@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 @ClientEndpoint
 public class ToDoListClientEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(ToDoListClientEndpoint.class);
+    private static final org.apache.log4j.Logger log4jLogger = org.apache.log4j.Logger.getLogger("session");
     
     @OnMessage
     public void processMessageFromServer(String msg, Session session) {
@@ -24,6 +25,7 @@ public class ToDoListClientEndpoint {
      */
     @OnOpen
     public void onClientSideSessionOpen(final Session openSession){
+        log4jLogger.info(openSession);
         LOGGER.info("The Session is open at the client side " + openSession);
     }
     
