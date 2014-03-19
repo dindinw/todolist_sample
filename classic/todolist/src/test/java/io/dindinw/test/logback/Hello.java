@@ -43,6 +43,11 @@ public class Hello {
         logger.trace("Hello world in Trace level");        
     }
     
+    /**
+     * Try to set all logger's Level to ALL, so all level's log can be printed.
+     * Note: Actually we don't need to do this in such stupid way. a smarter alternative may a 
+     * Filter
+     */
     public static void forceLog(){
         final ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.ALL);
@@ -57,4 +62,5 @@ public class Hello {
         logger.debug(msg);
         logger.trace(msg);
     }
+    
 }

@@ -13,10 +13,18 @@
       <pattern>%date %-5level [%thread] %logger{36} [:%method:%line] %msg%n</pattern>
     </encoder>
   </appender>
+  
+  <appender name="FilteredConsole" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="io.dindinw.test.logback.ForceLogFilterTest$ForceLogFilter" />
+    <encoder>
+      <pattern>[%-5level] %msg%n</pattern>
+    </encoder>
+  </appender>
 
   <root level="info">
     <appender-ref ref="STDOUT" />
   </root>
+  
   <!-- set the additivity to false will let the appenders from the pretent's logger,
        the root logger in the case, stop working. so that we don't print two lines
        with different format pattern in the console.
@@ -24,4 +32,9 @@
   <logger name="io.dindinw.test.logback.Hello" level="info" additivity="false">
     <appender-ref ref="MyConsole" />
   </logger>
+  
+  <logger name="io.dindinw.test.logback.ForceLog" level="info" additivity="false">
+    <appender-ref ref="FilteredConsole" />
+  </logger>
+
 </configuration>
