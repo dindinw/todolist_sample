@@ -9,6 +9,9 @@ import javax.websocket.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.util.StatusPrinter;
+
 @ClientEndpoint
 public class ToDoListClientEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(ToDoListClientEndpoint.class);
