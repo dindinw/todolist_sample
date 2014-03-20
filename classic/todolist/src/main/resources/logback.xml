@@ -21,6 +21,12 @@
     </encoder>
   </appender>
   
+   <appender name="StructuredMarkerConsole" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>[%-5level] %marker %msg%n</pattern>
+    </encoder>
+  </appender>
+  
   <turboFilter class="io.dindinw.test.logback.ForceLogFilterTest$ForceLogTurboFilter">
     <targetLogger>io.dindinw.test.logback.ForceLog</targetLogger>
     <doFilter>false</doFilter>
@@ -40,6 +46,10 @@
   
   <logger name="io.dindinw.test.logback.ForceLog" level="info" additivity="false">
     <appender-ref ref="FilteredConsole" />
+  </logger>
+  
+  <logger name="io.dindinw.test.logback.StructuredMarker" level="info" additivity="false">
+    <appender-ref ref="StructuredMarkerConsole" />
   </logger>
 
 </configuration>
