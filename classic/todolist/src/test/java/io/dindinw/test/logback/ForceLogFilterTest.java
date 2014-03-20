@@ -10,19 +10,34 @@ import ch.qos.logback.classic.turbo.TurboFilter;
 import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
 
+/**
+ * A Test to show how to force the logback to do log by ignoring the log level.
+ * The solution try to use the TurboFilter feature of logback.
+ * see details from : http://logback.qos.ch/manual/filters.html#TurboFilter
+ * 
+ * @author yidwu
+ *
+ */
 public class ForceLogFilterTest {
-
+    
+    /**
+     * The normal filter is scope is just the appender which is attached to.
+     * So The force log feature CAN NOT implemented by using a normal filter.
+     */
     public static class ForceLogFilter extends Filter<ILoggingEvent> {
-        
+        /**
+         * it's not work because the scope is limited to a appender, 
+         * appender can only see the effective level of a logger.
+         */
         @Override
         public FilterReply decide(ILoggingEvent event) {
-            return FilterReply.ACCEPT; //always accept
+            return FilterReply.ACCEPT; //NOT WORK
         }
         
     }
     
     /**
-     * differences between Filter and TurboFilter objects. 
+     * Differences between normal Filter and TurboFilter objects. 
      * 
      * 1. TurboFilter objects are tied to the logging context. Hence, they are called not only 
      * when a given appender is used, but each and every time a logging request is issued. 
@@ -31,6 +46,10 @@ public class ForceLogFilterTest {
      * instantiation of a logging event to filter a logging request. 
      * 
      * see http://logback.qos.ch/manual/filters.html#TurboFilter
+     * 
+     * The two customized tag here:
+     * 1. targetLogger: the filter only works for specified logger name.
+     * 2. doFilter: false flag to stop it working. the default is true.
      * 
      * @author yidwu
      *
@@ -71,6 +90,10 @@ public class ForceLogFilterTest {
         }
         
     }
+    /**
+     * Here we use a fixed name instead of class name for a bitter name in our testing case. the fixed name will
+     * be referred by our logback.xml
+     */
     private final static Logger logger = LoggerFactory.getLogger("io.dindinw.test.logback.ForceLog");
     
     public static void main(String[] args) {
