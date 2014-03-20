@@ -20,12 +20,17 @@
       <pattern>[%-5level] %msg%n</pattern>
     </encoder>
   </appender>
-
+  
+  <turboFilter class="io.dindinw.test.logback.ForceLogFilterTest$ForceLogTurboFilter">
+    <targetLogger>io.dindinw.test.logback.ForceLog</targetLogger>
+    <doFilter>false</doFilter>
+  </turboFilter>
+  
   <root level="info">
     <appender-ref ref="STDOUT" />
   </root>
   
-  <!-- set the additivity to false will let the appenders from the pretent's logger,
+  <!-- set the additivity to false will let the appenders from the logger's parent,
        the root logger in the case, stop working. so that we don't print two lines
        with different format pattern in the console.
        see http://logback.qos.ch/manual/architecture.html#additivity for details -->
