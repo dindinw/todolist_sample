@@ -1,5 +1,6 @@
 package io.dindinw.test.logback;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,9 +32,10 @@ public class StructuredMarkerTest {
         //see www.slf4j.org/api/org/slf4j/helpers/BasicMarker.html‎ for details
         private final Marker structuredMarker = org.slf4j.MarkerFactory.getMarker("StructuredMarker"+System.currentTimeMillis());
         
-        private final ThreadLocal<Map<String,String>> propertyMap = new ThreadLocal<Map<String,String>>();
+        private final Map<String,String> propertyMap;
         
         public StructuredMarker(){
+            this.propertyMap = new HashMap<String,String>();
         }
         
         @Override
@@ -76,24 +78,20 @@ public class StructuredMarkerTest {
             return structuredMarker.contains(name);
         }
         public void put(final String key, final String value){
-            if (propertyMap.get() == null){
-                propertyMap.set(new LinkedHashMap<String,String>());
-            }
-            propertyMap.get().put(key, value);
+            propertyMap.put(key, value);
         }
         
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append(getName());
-            sb.append(propertyMap.get().toString());
+            sb.append(propertyMap.toString());
             Iterator it = this.iterator();
             while (it.hasNext()){
                 sb.append("{");
                 sb.append(it.next().toString());
                 sb.append("}");
             }
-
             return sb.toString();
         }
         
@@ -107,41 +105,9 @@ public class StructuredMarkerTest {
         sMarker.put("user","bar");
         
         logger.info(sMarker,msg);
-        Thread t = new Thread(){
-           public void run() {
-               sMarker.put("id","2");
-               try {
-                TimeUnit.MILLISECONDS.sleep(10);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-               sMarker.put("name","foo2");
-               sMarker.put("user","bar2");
-               sMarker.put("name!!","foo2!!");
-               logger.info(sMarker,msg);
-           }; 
-        };
-        Thread t2 = new Thread(){
-            public void run() {
-                sMarker.put("id","3");
-                sMarker.put("name","foo3");
-                try {
-                    TimeUnit.MILLISECONDS.sleep(10);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                sMarker.put("user","bar3");
-                logger.info(sMarker,msg);
-            }; 
-         };
-        t.start();
-        t2.start();
         logger.info(sMarker,msg);
         logger.info(sMarker,msg);
-        t.join();
-        t2.join();
+        
         sMarker.put("id","4");
         sMarker.put("name","foo4");
         sMarker.put("user","bar4");
@@ -151,6 +117,7 @@ public class StructuredMarkerTest {
         sMarker.put("user","bar5");
         logger.info(sMarker,msg);
         
+        //Test for a children marker, although don't the use case.
         StructuredMarker child = new StructuredMarker();
         child.put("name", "child");
         sMarker.add(child);
