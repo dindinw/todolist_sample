@@ -42,12 +42,12 @@ import org.junit.Test;
  * synchronized block.
  * 
  * @author yidwu
- * 
+ * @see http://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html
  */
 public class ObjectWaitTest {
     /**
      * When Thread t execute {@code wait()} on object o, if there is zero of
-     * number of lock actions by Thread t on oject o. then a
+     * number of lock actions by Thread t on object o. then a
      * {@code IllegalMonitorStateException} thrown.
      * 
      */
@@ -122,7 +122,7 @@ public class ObjectWaitTest {
     }
 
     /**
-     * Normal wait for mills s
+     * Normal wait for millsecs
      * 
      * @throws InterruptedException
      */
@@ -138,7 +138,20 @@ public class ObjectWaitTest {
     }
 
     /**
-     ** how to remove : By using notify() method the code is dead lock p
+     * Wait Set
+     * <ul>
+     * <li>Every object, has an associated wait set. A wait set is a set of threads.
+     * <li>When a object is created, its wait set is empty. 
+     * <li>Actions to add/remove threads to/from wait sets are atomic. 
+     * <li>Wait sets are manipulated only through Object.wait/notify/notifyAll.
+     * </ul>
+     * wait()
+     * <ul>
+     * <li>1. Thread t add to Object o's wait set.
+     * <li>2. 
+     * </ul>
+     * <p>
+     * how to remove : By using notify() method the code is dead lock p
      * 
      * @throws InterruptedException
      */
