@@ -46,6 +46,13 @@ public class SynchronizTest {
     
     /**
      * Reentrancy means the lock is acquired per-thread instead of per-invocation
+     * <p>
+     * The lock is associated the thread owned it, and a acquisition count. 
+     * When thread try to acquire a lock, only when the count is zero. the lock 
+     * can be holed. if the acquisition is performed, the JVM record the owner thread
+     * and set the count to 1. when the same thread acquired the lock again, the count 
+     * will be increased. when the owning thread exit the synchronized block, the count
+     * is decreased. when the count reach to zero. the lock is released.
      */
     public static class ReentrancyBase {
         public synchronized void doSomething(){
@@ -59,9 +66,21 @@ public class SynchronizTest {
             super.doSomething(); //not dead lock, same thread 
         }
     }
+    public static class ReentrancyInSyncBlock{
+        private final static Object o = new Object();
+        public void doSomething(){
+            synchronized(o){
+                System.out.println("syn outside");
+                synchronized(o){ // not dead lock
+                    System.out.println("syn inside"); 
+                }
+            }
+        }
+    }
     @Test
     public void testReentrancy(){
         new ReentrancyDerived().doSomething();
+        new ReentrancyInSyncBlock().doSomething();
     }
     
     
