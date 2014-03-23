@@ -1,13 +1,48 @@
 package io.dindinw.concurrent;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
 /**
  * 
+ * <ul>
+ * <li>1. add caller thread to object o's wait set.
+ * <li>2. and try to perform unlock action
+ * <li>3. caller thread blocked until it removed from wait set.
+ * <p>
+ * Although, the unlock is performed. but no way to remove thread from wait-set.
+ * so block until the max time elapsed.(100ms in the case)
+ * </ul>
+ * 
+ * From 14.1.3 of JCIP by Brain Goetz
+ * <p>
+ * Just as each Java object can act as a lock, each object can also act as a
+ * condition queue, and the {@code wait}, {@code notify},and {@code notifyAll}
+ * methods in Object constitute the API for intrinsic condition queues.
+ * <p>
+ * An object’s intrinsic lock and its intrinsic condition queue are related: in
+ * order to call any of the condition queue methods on object X , you must hold
+ * the lock on X.
+ * <p>
+ * Object.wait atomically releases the lock and asks the OS to suspend the
+ * current thread, allowing other threads to acquire the lock and therefore
+ * modify the object state. Upon waking, it re-acquires the lock before
+ * returning.
+ * <p>
+ * Intuitively, It means “I want to goto sleep, but wake me when something
+ * interesting happens”, and calling the notification methods means “something
+ * interesting appended ”.
+ * <p>
+ * After the thread wakes up, wait re-acquires the lock before returning. A
+ * thread waking up from wait gets no special priority in re-acquiring the lock;
+ * it contends for the lock just like any other thread attempting to enter a
+ * synchronized block.
+ * 
  * @author yidwu
- *
+ * 
  */
 public class ObjectWaitTest {
     /**
@@ -17,39 +52,94 @@ public class ObjectWaitTest {
      * 
      */
     @Test
-    public void testIlleaglMonitorException() {
+    public void testObjectWaitIlleaglMonitorException() {
         Object o = new Object();
         try {
             o.wait(); // a java.lang.IllegalMonitorStateException will throw
+            fail(); // not here
+        } catch (IllegalMonitorStateException success) {
+            System.out.println("SUCCESS!"); // excepted
         } catch (Exception e) {
-            assertTrue(e instanceof java.lang.IllegalMonitorStateException);
+            fail(); // should not here
         }
     }
 
     /**
-     * <ul>
-     * <li>1. add caller thread to object o's wait set.
-     * <li>2. and try to perform unlock action
-     * <li>3. caller thread blocked until it removed from wait set.
-     * <p>
-     * Although, the unlock is performed. but no way to remove thread from wait-set.
-     * so block until the max time elapsed.(100ms in the case)
-     * </ul>
+     * If this is a timed wait and the nanosecs argument is not in the range of
+     * 0-999999 or the millisecs argument is negative, then an
+     * IllegalArgumentException is thrown.
+     */
+    @Test
+    public void testObjectWaitIllegalArg() {
+        final Object o = new Object();
+        try {
+            synchronized (o) {
+                o.wait(-1); // wrong argument
+                fail(); // no way to here
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("SUCCESS!"); // excepted
+        } catch (Exception e) {
+            fail(); // no way to here.
+        }
+    }
 
+    /**
+     * if thread t is interrupted, then an InterruptedException is thrown and
+     * t's interruption status is set to false.
      * 
+     * @see http://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html
+     */
+    @Test
+    public void testObjectWaitInterrupted() {
+        final Object o = new Object();
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    synchronized (o) {
+                        o.wait(); // t is waiting for notify, in the case means
+                                  // forever
+                        fail(); // no way to here
+                    }
+                    fail(); // no way to here
+                } catch (InterruptedException success) { // throw in wait()
+                    // success.printStackTrace();
+                    assertFalse(isInterrupted());
+                    System.out.println("SUCCESS!"); // excepted interrupt
+                }
+            }
+        };
+        try {
+            t.start();
+            t.interrupt();
+            t.join();
+            assertFalse(t.isAlive()); // verify the join is returned
+                                      // successfully.
+        } catch (Exception unexpected) {
+            fail(); // if we go here, it's error
+        }
+    }
+
+    /**
+     * Normal wait for mills s
      * 
      * @throws InterruptedException
      */
     @Test
-    public void testObjectWait() throws InterruptedException {
+    public void testObjectWaitMills() throws InterruptedException {
         Object o = new Object();
+        final long start = System.currentTimeMillis();
         synchronized (o) {
             o.wait(100); // blocked 100ms
         }
+        final long end = System.currentTimeMillis();
+        assertEquals(100, end - start);
     }
 
     /**
-     ** how to remove : By using notify() method
+     ** how to remove : By using notify() method the code is dead lock p
+     * 
      * @throws InterruptedException
      */
     @Test
@@ -78,9 +168,9 @@ public class ObjectWaitTest {
             @Override
             public void run() {
                 synchronized (o) {
-                    o.notify();
-                    System.out.println("done notify in t2");
                     try {
+                        o.notify();
+                        System.out.println("done notify in t2");
                         o.wait();
                         System.out.println("recovery from wait() in t2");
                     } catch (InterruptedException e) {
@@ -128,8 +218,9 @@ public class ObjectWaitTest {
         t3.join();
         t4.join();
     }
+
     @Test
-    public void testObjectWaitSetRemovalByNotifyAll(){
-        
+    public void testObjectWaitSetRemovalByNotifyAll() {
+
     }
 }
