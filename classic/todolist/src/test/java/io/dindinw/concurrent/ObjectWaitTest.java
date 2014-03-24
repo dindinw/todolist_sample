@@ -1,8 +1,11 @@
 package io.dindinw.concurrent;
 
-import static org.junit.Assert.assertEquals;
+import static io.dindinw.concurrent.TestHelper.LOGGER;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
@@ -58,7 +61,7 @@ public class ObjectWaitTest {
             o.wait(); // a java.lang.IllegalMonitorStateException will throw
             fail(); // not here
         } catch (IllegalMonitorStateException success) {
-            System.out.println("SUCCESS!"); // excepted
+            LOGGER.info("SUCCESS!"); // excepted
         } catch (Exception e) {
             fail(); // should not here
         }
@@ -78,7 +81,7 @@ public class ObjectWaitTest {
                 fail(); // no way to here
             }
         } catch (IllegalArgumentException e) {
-            System.out.println("SUCCESS!"); // excepted
+            LOGGER.info("SUCCESS!"); // excepted
         } catch (Exception e) {
             fail(); // no way to here.
         }
@@ -93,7 +96,7 @@ public class ObjectWaitTest {
     @Test
     public void testObjectWaitInterrupted() {
         final Object o = new Object();
-        Thread t = new Thread() {
+        Thread t = new Thread("testObjectWaitInterrupted_t") {
             @Override
             public void run() {
                 try {
@@ -105,8 +108,9 @@ public class ObjectWaitTest {
                     fail(); // no way to here
                 } catch (InterruptedException success) { // throw in wait()
                     // success.printStackTrace();
+                    LOGGER.info("SUCCESS!"); // excepted interrupt
                     assertFalse(isInterrupted());
-                    System.out.println("SUCCESS!"); // excepted interrupt
+                    
                 }
             }
         };
@@ -134,7 +138,7 @@ public class ObjectWaitTest {
             o.wait(100); // blocked 100ms
         }
         final long end = System.currentTimeMillis();
-        assertEquals(100, end - start);
+        assertTrue((end - start) >= 100); // elapsed time may 100ms or 101ms (depends on OS system)
     }
 
     /**
@@ -147,8 +151,7 @@ public class ObjectWaitTest {
      * </ul>
      * wait()
      * <ul>
-     * <li>1. Thread t add to Object o's wait set.
-     * <li>2. 
+     * <li>1. Thread t add to Object o's wait set and unlock
      * </ul>
      * <p>
      * how to remove : By using notify() method the code is dead lock p
@@ -156,84 +159,190 @@ public class ObjectWaitTest {
      * @throws InterruptedException
      */
     @Test
-    public void testObjectWaitSetRemovalByNotify() throws InterruptedException {
+    public void testObjectWaitNotify() throws InterruptedException {
         final Object o = new Object();
-        Thread t1 = new Thread(new Runnable() {
+        Thread t1 = new Thread("testObjectWaitNotify_t1"){
             @Override
             public void run() {
                 synchronized (o) {
                     try {
+                        LOGGER.info("t1 is waiting for ...");
                         o.wait();
-                        System.out.println("recoveryed from wait() in t1");
+                        //Upon waking, it re-acquires the lock before returning. it's atomatic
+                        LOGGER.info("t1 is notified by t2");
                         o.notify();
-                        System.out.println("done notify in t1");
-                        System.out.println("t1 fininshed");
+                        LOGGER.info("t1 notfiy t2");
                     } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        fail(); // not go here
                     }
                 }
+                LOGGER.info("t1 fininshed!");
             }
 
-        });
+        };
+
+        Thread t2 = new Thread("testObjectWaitNotify_t2"){
+            @Override
+            public void run() {
+                synchronized (o) {
+                    try {
+                        o.notify();
+                        LOGGER.info("t2 notify t1");
+                        LOGGER.info("t2 is waiting for ...");
+                        o.wait();
+                        LOGGER.info("t2 is notified by t1");
+                    } catch (Exception e) {
+                        fail(); // not go here
+                    }
+                }
+                LOGGER.info("t2 fininshed!");
+            }
+
+        };
+        
         t1.start();
-        Thread t2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (o) {
-                    try {
-                        o.notify();
-                        System.out.println("done notify in t2");
-                        o.wait();
-                        System.out.println("recovery from wait() in t2");
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    System.out.println("t2 fininshed!");
-                }
-            }
-
-        });
         t2.start();
+        t1.join(100);
+        t2.join(100);
+        assertFalse(t1.isAlive());
+        assertFalse(t2.isAlive());
+    }
 
-        Thread t3 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (o) {
-                    try {
-                        o.wait();
-                        System.out.println("recovery from wait() in t3");
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+    static class FooServer {
+        private enum state {STOPPED,RUNNING,FAILED};
+        private state _state = state.STOPPED;
+        private static final Object _lock = new Object();
+        private static final Object _joinlock = new Object();
+        public void join() throws InterruptedException{
+            synchronized(_joinlock){
+                while (isRunning()){
+                    _joinlock.wait();
+                }
+            }
+        }
+        public boolean isRunning () {
+            return  _state == state.RUNNING ;
+        }
+        public boolean isStopped () {
+            return _state == state.STOPPED;
+        }
+        public boolean isFailed () {
+            return _state == state.FAILED;
+        }
+        public void start() throws Exception{
+            synchronized (_lock){
+                if (isRunning()) return;
+                try {
+                    doStart();
+                    _state = state.RUNNING;
+                    LOGGER.info("Foo Server started!");
+                } catch (Exception e) {
+                    _state = state.FAILED;
+                    throw e;
+                }
+            }
+        }
+        public void stop() throws Exception{
+            synchronized (_lock){
+                if (!isRunning()) return;
+                try {
+                    doStop();
+                    _state = state.STOPPED;
+                    LOGGER.info("Foo Server stopped!");
+                    synchronized(_joinlock){
+                        _joinlock.notifyAll(); 
+                    //Here notifyAll to mark sure all threads that are waiting 
+                    //on this object's monitor are notified
                     }
-                    System.out.println("t3 fininished!");
-                }
+                } catch (Exception e) {
+                    _state = state.FAILED;
+                    throw e;
+                } 
             }
-        });
-        t3.start();
-
-        Thread t4 = new Thread(new Runnable() {
+        }
+        protected void doStop() throws Exception{}  // time-consume
+        protected void doStart() throws Exception{} // time-consume
+    }
+    @Test
+    public void testObjectWaitNotifyAll() throws Exception {
+        final FooServer server = new FooServer(){
+            @Override
+            protected void doStart() throws Exception {
+                TimeUnit.MILLISECONDS.sleep(100);
+            }
+            @Override
+            protected void doStop() throws Exception {
+                TimeUnit.MILLISECONDS.sleep(200);
+            }
+        };
+        Thread t1 = new Thread("FooServer_start"){
             @Override
             public void run() {
-                synchronized (o) {
-                    o.notify();
-                    System.out.println("done notify() in t4");
-                    System.out.println("t4 fininished!");
+                try {
+                    server.start();
+                } catch (Exception e) {
+                    fail(); //not go there
                 }
             }
-        });
+        };
+        Thread t2 = new Thread("FooServer_stop"){
+            @Override
+            public void run() {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(1500); //mock some time consume
+                    server.stop();
+                } catch (Exception e) {
+                    fail(); //not go there
+                }
+            }
+        };
+        
+        Thread t3 = new Thread("FooServer_join1"){
+            @Override
+            public void run() {
+                try {
+                    server.join();
+                } catch (Exception e) {
+                    fail(); //not go there
+                }
+            }
+        };
+        Thread t4 = new Thread("FooServer_join2"){
+            @Override
+            public void run() {
+                try {
+                    server.join();
+                } catch (Exception e) {
+                    fail(); //not go there
+                }
+            }
+        };
+        
+        assertTrue(server.isStopped()); 
+        assertFalse(server.isRunning());
+        server.join(); //not wait, because server is not started
+        
+        assertTrue(server.isStopped()); //before t1 start, server not started
+        t1.start();
+        t1.join();  //after t1 done
+        assertTrue(server.isRunning()); //server started ok
+        
+        t3.start();
         t4.start();
-
-        t1.join();
-        t2.join();
-        t3.join();
-        t4.join();
+        
+        t2.start(); //try to do stop job
+        /**
+         * Here if we change the notifyAll to notify, t3 and t4 may not return
+         * Because, We have 3 thread in the wait set. t3,t4 and main. when stop
+         * send a notify, only one guarantee wake up.
+         */
+        t3.join();  //make sure join return ok
+        t4.join();  //make sure join return ok
+        server.join(); 
+        
+        assertFalse(server.isRunning());  //verify the server is not running
+        assertTrue(server.isStopped());
     }
 
-    @Test
-    public void testObjectWaitSetRemovalByNotifyAll() {
 
-    }
 }
