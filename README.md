@@ -1,5 +1,5 @@
-todolist_sample
-===============
+MyToDo 
+========
 
 A sample App to demo different tech stack for Web app.
 

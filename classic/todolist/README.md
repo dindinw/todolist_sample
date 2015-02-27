@@ -1,4 +1,4 @@
-todolist Classic
+Todolist Classic
 ================
 
 The Classic Java Web App. 

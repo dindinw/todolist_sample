@@ -1,6 +1,5 @@
 package io.dindinw.concurrent;
 
-import static io.dindinw.concurrent.TestHelper.LOGGER;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -8,6 +7,8 @@ import static org.junit.Assert.fail;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -48,6 +49,7 @@ import org.junit.Test;
  * @see http://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html
  */
 public class ObjectWaitTest {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ObjectWaitTest.class);
     /**
      * When Thread t execute {@code wait()} on object o, if there is zero of
      * number of lock actions by Thread t on object o. then a
