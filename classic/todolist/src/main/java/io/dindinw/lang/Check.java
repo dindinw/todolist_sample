@@ -45,9 +45,17 @@ public final class Check {
     }
     
     public static <T extends Iterable<?>> void checkNotEmpty(T iterable ){
+        checkNotEmpty(iterable, "empty %s",iterable.getClass().getSimpleName());
+    }
+    
+    public static <T extends Iterable<?>> void checkNotEmpty(T iterable ,String errMsg) {
+        checkNotEmpty(iterable,errMsg,"");
+    }
+    
+    public static <T extends Iterable<?>> void checkNotEmpty(T iterable ,String errMsgTemplate, Object ... errMsgArgs) {
         checkNotNull(iterable);
         Iterator<?> iter = iterable.iterator();
-        checkArg(iter.hasNext() == true, "empty %s",iterable.getClass().getSimpleName());
+        checkArg(iter.hasNext() == true, errMsgTemplate,errMsgArgs);
     }
     
     public static void checkNotEmpty(String input){
@@ -96,10 +104,6 @@ public final class Check {
         _checkElementNotNull(array,index);
         return array[index];
     }
-   
-    private static <T> void _checkElementNotNull(T[] array, int index){
-        checkNotNull(array[index], "at index [%s]", index);
-    }
     
     public static <T> T[] checkIndexInArray(T[] array, int index){
         checkNotNull(array);
@@ -125,6 +129,9 @@ public final class Check {
         return array[index];
     }
     
+    private static <T> void _checkElementNotNull(T[] array, int index){
+        checkNotNull(array[index], "at index [%s]", index);
+    }
     private static <T> void _checkElementNotEmpty(String[] stringArray, int index){
         checkNotEmpty(stringArray[index], "empty string at index [%s]", index);
     }
