@@ -3,11 +3,13 @@ package io.dindinw.util;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+
+import static io.dindinw.lang.Check.checkElementsNotNull;
 
 /**
  * My Util additional to 
@@ -18,23 +20,36 @@ import java.util.Set;
  *
  */
 public class CollecUtil {
+
+    /**
+     * like guava : Lists.newArrayList("alpha", "beta", "gamma");
+     * @return
+     * @see also http://docs.guava-libraries.googlecode.com/git-history/release/javadoc/src-html/com/google/common/collect/Lists.html?r=release
+     */
+    public static <T> ArrayList<T> newArrayList(T... elements){
+        checkElementsNotNull(elements);
+        ArrayList<T> list = new ArrayList<T>(elements.length);
+        Collections.addAll(list,elements);
+        return list;
+    }
     
     /**
      * 
      * @param comparable
-     * @return unmutable List from Arrays.asList()
+     * @return immutable List from Arrays.asList()
      */
     @SafeVarargs
-    public static <U extends Comparable<U>> List<U> unmutableSortedList(U... comparable){
-            Arrays.sort(comparable);
-            return Arrays.asList(comparable);
+    public static <T extends Comparable<T>> List<T> immutableSortedList(T... comparableElements){
+            Arrays.sort(comparableElements);
+            return Arrays.asList(comparableElements);
     }
     
+    
     @SafeVarargs
-    public static <U extends Comparable<U>> List<U> newSortedList(U... comparable){
-            Arrays.sort(comparable);
-            List<U> myList = new ArrayList<>(comparable.length);
-            for (U u : comparable){
+    public static <T extends Comparable<T>> List<T> newSortedList(T... comparableElements){
+            Arrays.sort(comparableElements);
+            List<T> myList = new ArrayList<>(comparableElements.length);
+            for (T u : comparableElements){
                 myList.add(u);
             }
             return myList;

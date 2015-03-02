@@ -1,7 +1,7 @@
 package test.io.dindinw.util;
 
+import static io.dindinw.util.CollecUtil.immutableSortedList;
 import static io.dindinw.util.CollecUtil.newSortedList;
-import static io.dindinw.util.CollecUtil.unmutableSortedList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -26,9 +26,9 @@ public class CollecUtilTest {
     
     
     @Test
-    public void test_unmutableSortedList_throw_UnsupportedOperationException(){
-        List<String> list1 = unmutableSortedList("alex","wu","1_text");
-        List<String> list2 = unmutableSortedList("alex","wu","1_text");
+    public void test_immutableSortedList_throw_UnsupportedOperationException(){
+        List<String> list1 = immutableSortedList("alex","wu","1_text");
+        List<String> list2 = immutableSortedList("alex","wu","1_text");
         list1.equals(list2);
         assertFalse(list1==list2); //two objects
         assertEquals(list1,list2); //two lists are equals because the strings which the list contain are same.
