@@ -35,8 +35,9 @@ public class CheckTest {
         Check.checkArg(age>30, "[%s]'s age should not less than [%s]","alex",30);
     }
     
+    
     @Test
-    public void test_CheckNull_1default(){
+    public void test_CheckNull_1null(){
         thrown.expect(NullPointerException.class);
         Check.checkNotNull(null);
     }
@@ -90,21 +91,21 @@ public class CheckTest {
     public void test_checkElementsNotNull_1array_1(){
         thrown.expect(NullPointerException.class);
         thrown.expectMessage("at index [1]"); 
-        Check.checkElementsNotNull("alex",null,"wu"); //the 2nd is null
+        Check.checkNotContainNullElement(new Object[]{"alex",null,"wu"}); //the 2nd is null
     }
     
     @Test
     public void test_checkElementsNotNull_1array_2(){
         thrown.expect(NullPointerException.class);
         thrown.expectMessage("at index [1]"); 
-        Check.checkElementsNotNull("",null); //the 2nd is null
+        Check.checkNotContainNullElement(new Object[]{"",null}); //the 2nd is null
     }
     
     @Test
     public void test_checkElementsNotNull_2list(){
         thrown.expect(NullPointerException.class);
         List<String> myList = Arrays.asList("alex",null,"wu");
-        Check.checkElementsNotNull(myList); //the 2nd is null
+        Check.checkNotContainNullElement(myList); //the 2nd is null
     }
     
     @Test
@@ -112,29 +113,30 @@ public class CheckTest {
         thrown.expect(NullPointerException.class);
         Set<String> mySet = new HashSet<>();
         mySet.addAll(Arrays.asList("alex",null,"wu"));
-        Check.checkElementsNotNull(mySet); //the 2nd is null
+        Check.checkNotContainNullElement(mySet); //the 2nd is null
     }
     
     
     @Test
-    public void test_checkElementNotNull(){
+    public void test_checkNullElement(){
         thrown.expect(NullPointerException.class);
         thrown.expectMessage("at index [0]"); 
-        Check.checkElementNotNull(new Object[]{null,"alex","wu"}, 0); //the 1nd is null
+        Check.checkNotContainNullElement(new Object[]{null,"alex","wu"}, 0); //the 1nd is null
     }
     
     @Test
     public void test_checkElementsNotEmpty_normal(){
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("empty string at index [0]");
-        Check.checkElementsNotEmpty(new String[]{"","alex","wu"}); //the 1nd is empty
+        Check.checkNotContainEmptyElement(new String[]{"","alex","wu"}); //the 1nd is empty
     }
     
     @Test
     public void test_checkElementsNotEmpty_emptyarray(){
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("empty String[]");
-        Check.checkElementsNotEmpty(new String[]{}); // the 2nd is empty
+        Check.checkNotContainEmptyElement(new String[]{}); // the 2nd is empty
+        
     }
    
 }

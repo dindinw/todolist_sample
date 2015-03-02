@@ -33,18 +33,18 @@ public final class Check {
     }
     
     public static <T> void checkNotEmpty(T[] array){
+        checkNotNull(array);
         checkNotEmpty(array,"empty %s",array.getClass().getSimpleName());
     }
-    
     public static <T> void checkNotEmpty(T[] array,String errMsg){
         checkNotEmpty(array,errMsg,"");
     }
-    
-    public static <T> void checkNotEmpty(T[] array, String errMsgTemplate, Object ... errMsgArgs) {
+    public static <T> void checkNotEmpty(T[] array,String errMsgTemplate, Object ... errMsgArgs){
         checkArg(array.length > 0,errMsgTemplate,errMsgArgs);
     }
     
     public static <T extends Iterable<?>> void checkNotEmpty(T iterable ){
+        checkNotNull(iterable);
         checkNotEmpty(iterable, "empty %s",iterable.getClass().getSimpleName());
     }
     
@@ -75,20 +75,10 @@ public final class Check {
      * 
      * @see also http://docs.guava-libraries.googlecode.com/git-history/release/javadoc/src-html/com/google/common/collect/ObjectArrays.html?r=release
      */
-    public static <T> T[] checkElementsNotNull(T... elements){
-        checkNotEmpty(elements);
+    public static <T> T[] checkNotContainNullElement(T[] elements){
+        checkNotNull(elements);
         for (int i = 0 ; i < elements.length; i++){
             _checkElementNotNull(elements,i);
-        }
-        return elements;
-    }
-    
-    public static <T extends Iterable<U>, U> T checkElementsNotNull(T elements){
-        checkNotNull(elements);
-        Iterator<U> iter = elements.iterator();
-        while(iter.hasNext()){
-            U element = iter.next();
-            checkNotNull(element,"%s %s contains null",elements.getClass().getSimpleName(), elements);
         }
         return elements;
     }
@@ -99,21 +89,26 @@ public final class Check {
      * @param index
      * @return
      */
-    public static <T> T checkElementNotNull(T[] array, int index){
+    public static <T> T checkNotContainNullElement(T[] array, int index){
+        checkNotNull(array);
         checkIndexInArray(array,index);
         _checkElementNotNull(array,index);
         return array[index];
     }
     
-    public static <T> T[] checkIndexInArray(T[] array, int index){
-        checkNotNull(array);
-        checkArg(index>=0,"input index [%s] should not be negative.",index);
-        checkArg(index<array.length,"input index [%s] should not be bigger than array's length [%s].",index,array.length);
-        return array;
+    public static <T extends Iterable<U>, U> T checkNotContainNullElement(T elements){
+        checkNotNull(elements);
+        Iterator<U> iter = elements.iterator();
+        while(iter.hasNext()){
+            U element = iter.next();
+            checkNotNull(element,"%s %s contains null",elements.getClass().getSimpleName(), elements);
+        }
+        return elements;
     }
     
     
-    public static String[] checkElementsNotEmpty(String... elements){
+    public static String[] checkNotContainEmptyElement(String[] elements){
+        checkNotNull(elements);
         checkNotEmpty(elements);
         for (int i = 0 ; i < elements.length; i++){
             _checkElementNotNull(elements,i);
@@ -121,14 +116,23 @@ public final class Check {
         }
         return elements;
     }
-    
-    public static String checkElementNotEmpty(String[] array, int index){
+    public static String checkNotContainEmptyElement(String[] array, int index){
+        checkNotNull(array);
         checkIndexInArray(array,index);
         _checkElementNotNull(array,index);
         _checkElementNotEmpty(array,index);
         return array[index];
     }
+
+
+
     
+    public static <T> T[] checkIndexInArray(T[] array, int index){
+        checkNotNull(array);
+        checkArg(index>=0,"input index [%s] should not be negative.",index);
+        checkArg(index<array.length,"input index [%s] should not be bigger than array's length [%s].",index,array.length);
+        return array;
+    }
     private static <T> void _checkElementNotNull(T[] array, int index){
         checkNotNull(array[index], "at index [%s]", index);
     }
