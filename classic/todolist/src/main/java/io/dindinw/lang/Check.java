@@ -29,6 +29,7 @@ public final class Check {
         checkNotNull(input,errMsg,"");
     }
     public static <T> void checkNotNull(T input, String errMsgTemplate, Object ... errMsgArgs) {
+        errMsgTemplate = String.valueOf(errMsgTemplate); // null -> "null"
         Objects.requireNonNull(input, String.format(errMsgTemplate, errMsgArgs));
     }
     

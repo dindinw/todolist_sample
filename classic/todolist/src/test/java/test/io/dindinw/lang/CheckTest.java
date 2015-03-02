@@ -41,6 +41,20 @@ public class CheckTest {
         thrown.expect(NullPointerException.class);
         Check.checkNotNull(null);
     }
+    
+    @Test
+    public void test_CheckNull_1nullmsg(){
+        thrown.expect(NullPointerException.class);
+        thrown.expectMessage("null");  //notice the output
+        Check.checkNotNull(null,null); 
+    }
+    
+    @Test
+    public void test_CheckNull_1nullmsg_varargs(){
+        thrown.expect(NullPointerException.class);
+        thrown.expectMessage("some thing null, some thing not_null");
+        Check.checkNotNull(null,"some thing %s, some thing %s",null,"not_null"); 
+    }
     @Test
     public void test_CheckNull_2SimpleErrorMessage(){
         thrown.expect(NullPointerException.class);
