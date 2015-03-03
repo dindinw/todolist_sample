@@ -47,14 +47,14 @@ public class SysUtil {
         //System.getProperties().list(out); not sorted!
         out.println("-- SYSTEM Properties --");
         Map<String,String> propMap = getSysProps();
-        for (String key : CollecUtil.toSortedList(propMap.keySet())){ 
+        for (String key : CollectUtil.asImmutableSortedList(propMap.keySet())){
             out.println(key + "=" + propMap.get(key));
         }
         out.println("-- PATH --");
         out.println(getSysPath());
         out.println("-- ALL ENV --");
         Set<String> keySet = System.getenv().keySet();
-        for (String key : CollecUtil.toSortedList2(keySet)){ 
+        for (String key : CollectUtil.asImmutableSortedList(keySet)){
             out.println(key + "=" + System.getenv(key));
         }
     }

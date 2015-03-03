@@ -43,10 +43,10 @@ public class CheckTest {
     }
     
     @Test
-    public void test_CheckNull_1nullmsg(){
+    public void test_CheckNull_1nullMsg(){
         thrown.expect(NullPointerException.class);
         thrown.expectMessage("null");  //notice the output
-        Check.checkNotNull(null,null); 
+        Check.checkNotNull(null,null);
     }
     
     @Test

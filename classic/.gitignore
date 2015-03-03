@@ -7,6 +7,7 @@
 *.pydevproject
 .metadata
 .gradle
+.idea
 bin/
 tmp/
 *.tmp

@@ -5,11 +5,11 @@ import java.util.Objects;
 
 /**
  * Utility class for input check.
- * <p> Inspired by Google guava's Precondition class. But instead, use the 
- * standard JDK 7 methods. 
- * 
+ * <p>
+ *     Inspired by Google guava's Precondition class. But instead, use the standard JDK 7 methods.
+ *
+ * @see @linktourl http://docs.guava-libraries.googlecode.com/git-history/release/javadoc/src-html/com/google/common/base/Preconditions.html
  * @author alex
- * @see also http://docs.guava-libraries.googlecode.com/git-history/release/javadoc/src-html/com/google/common/base/Preconditions.html
  */
 public final class Check {
     private Check() {}
@@ -17,7 +17,7 @@ public final class Check {
     public static void checkArg(boolean exp,String errMsg){
         checkArg(exp,errMsg,"");
     }
-    public static void checkArg(boolean exp,String errMsgTemplate, Object ... errMsgArgs){
+    public static void checkArg(boolean exp,String errMsgTemplate, Object... errMsgArgs){
         if (!exp){
             throw new IllegalArgumentException(String.format(errMsgTemplate, errMsgArgs));
         }
@@ -126,8 +126,6 @@ public final class Check {
     }
 
 
-
-    
     public static <T> T[] checkIndexInArray(T[] array, int index){
         checkNotNull(array);
         checkArg(index>=0,"input index [%s] should not be negative.",index);
