@@ -34,6 +34,7 @@ public class CollectUtilTest {
 
     @Test
     public void test_asImmutableSortedList_setWithNullElements(){
+        thrown.expect(NullPointerException.class);
         Set<String> nullSet = new HashSet<>();
         nullSet.add(null);
         asImmutableSortedList(nullSet);
@@ -41,6 +42,7 @@ public class CollectUtilTest {
 
     @Test
     public void test_asImmutableSortedList_setContainsNullElements(){
+        thrown.expect(NullPointerException.class);
         Set<String> nullSet = new HashSet<>();
         nullSet.add("first");
         nullSet.add("2nd");
@@ -110,7 +112,7 @@ public class CollectUtilTest {
     public void test_newArrayList_null(){
         thrown.expect(NullPointerException.class);
         thrown.expectMessage("input elements array can't be null");
-        newArrayList((Object[])null);
+        newArrayList((Object[]) null);
     }
 
     @Test

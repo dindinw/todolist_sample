@@ -2,6 +2,7 @@ package io.dindinw.util;
 
 import static io.dindinw.lang.Check.checkNotContainNullElement;
 import static io.dindinw.lang.Check.checkNotNull;
+
 import java.util.*;
 
 /**
@@ -74,6 +75,7 @@ public class CollectUtil {
      */
     public static <T> List<T> asImmutableSortedList(Set<T> inputSet) {
         checkNotNull(inputSet, "inputSet can't be null.");
+        checkNotContainNullElement(inputSet);
         T[] myArray = (T[]) inputSet.toArray();
         Arrays.sort(myArray);
         return Arrays.asList(myArray);
@@ -109,15 +111,9 @@ public class CollectUtil {
      * @return an new ArrayList of element
      */
     public static <T> List<T> newSortedList(Set<T> inputSet) {
-        Object[] myArray = inputSet.toArray();
-        Arrays.sort(myArray);
-        List<T> result = new ArrayList<>(myArray.length);
-        ListIterator<T> i = result.listIterator();
-        for (int j = 0; j < myArray.length; j++) {
-            i.next();
-            i.set((T) myArray[j]);
-        }
-        return result;
+        T[] myArray = (T[])inputSet.toArray();
+        Arrays.sort(myArray);        
+        return newArrayList(myArray);
     }
 
     /**
