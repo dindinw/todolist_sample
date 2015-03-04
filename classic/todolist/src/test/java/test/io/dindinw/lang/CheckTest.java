@@ -50,7 +50,7 @@ public class CheckTest {
     }
     
     @Test
-    public void test_CheckNull_1nullmsg_varargs(){
+    public void test_CheckNull_1nullMsg_varargs(){
         thrown.expect(NullPointerException.class);
         thrown.expectMessage("some thing null, some thing not_null");
         Check.checkNotNull(null,"some thing %s, some thing %s",null,"not_null"); 
@@ -146,7 +146,7 @@ public class CheckTest {
     }
     
     @Test
-    public void test_checkElementsNotEmpty_emptyarray(){
+    public void test_checkElementsNotEmpty_emptyArray(){
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("empty String[]");
         Check.checkNotContainEmptyElement(new String[]{}); // the 2nd is empty

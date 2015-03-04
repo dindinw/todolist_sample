@@ -55,8 +55,8 @@ public final class Check {
     
     public static <T extends Iterable<?>> void checkNotEmpty(T iterable ,String errMsgTemplate, Object ... errMsgArgs) {
         checkNotNull(iterable);
-        Iterator<?> iter = iterable.iterator();
-        checkArg(iter.hasNext() == true, errMsgTemplate,errMsgArgs);
+        Iterator<?> iterator = iterable.iterator();
+        checkArg(iterator.hasNext(), errMsgTemplate,errMsgArgs);
     }
     
     public static void checkNotEmpty(String input){
@@ -74,7 +74,7 @@ public final class Check {
     
     /**
      * 
-     * @see also http://docs.guava-libraries.googlecode.com/git-history/release/javadoc/src-html/com/google/common/collect/ObjectArrays.html?r=release
+     * @see @linktourl http://docs.guava-libraries.googlecode.com/git-history/release/javadoc/src-html/com/google/common/collect/ObjectArrays.html?r=release
      */
     public static <T> T[] checkNotContainNullElement(T[] elements){
         checkNotNull(elements);
@@ -86,9 +86,9 @@ public final class Check {
     /**
      * Check if the element of array[index] is null, return element if not null
      * otherwise NPE thrown
-     * @param array
-     * @param index
-     * @return
+     * @param array input array
+     * @param index the index of the array
+     * @return the element aka. array[index]
      */
     public static <T> T checkNotContainNullElement(T[] array, int index){
         checkNotNull(array);
@@ -99,10 +99,8 @@ public final class Check {
     
     public static <T extends Iterable<U>, U> T checkNotContainNullElement(T elements){
         checkNotNull(elements);
-        Iterator<U> iter = elements.iterator();
-        while(iter.hasNext()){
-            U element = iter.next();
-            checkNotNull(element,"%s %s contains null",elements.getClass().getSimpleName(), elements);
+        for (U element : elements) {
+            checkNotNull(element, "%s %s contains null", elements.getClass().getSimpleName(), elements);
         }
         return elements;
     }
@@ -125,13 +123,12 @@ public final class Check {
         return array[index];
     }
 
-
-    public static <T> T[] checkIndexInArray(T[] array, int index){
+    public static <T> void checkIndexInArray(T[] array, int index){
         checkNotNull(array);
         checkArg(index>=0,"input index [%s] should not be negative.",index);
         checkArg(index<array.length,"input index [%s] should not be bigger than array's length [%s].",index,array.length);
-        return array;
     }
+
     private static <T> void _checkElementNotNull(T[] array, int index){
         checkNotNull(array[index], "at index [%s]", index);
     }
