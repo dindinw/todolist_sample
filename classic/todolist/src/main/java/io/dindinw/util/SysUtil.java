@@ -50,13 +50,13 @@ public class SysUtil {
         for (String key : CollectUtil.asImmutableSortedList(propMap.keySet())){
             out.println(key + "=" + propMap.get(key));
         }
-        out.println("-- PATH --");
-        out.println(getSysPath());
         out.println("-- ALL ENV --");
         Set<String> keySet = System.getenv().keySet();
         for (String key : CollectUtil.asImmutableSortedList(keySet)){
             out.println(key + "=" + System.getenv(key));
         }
+        out.println("-- PATH --");
+        out.println(getSysPath());
     }
     public static void main(String[] args) {
         dump(System.out);
