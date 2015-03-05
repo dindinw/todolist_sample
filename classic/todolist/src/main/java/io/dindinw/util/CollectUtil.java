@@ -5,6 +5,8 @@ import static io.dindinw.lang.Check.checkNotNull;
 
 import java.util.*;
 
+import io.dindinw.lang.Check;
+
 /**
  * My Collection Utility in additional to {@link java.util.Collections}
  * and {@link java.util.Arrays}.
@@ -94,11 +96,7 @@ public class CollectUtil {
     @SafeVarargs
     public static <T> List<T> newSortedList(T... elements) {
         Arrays.sort(elements);
-        List<T> myList = new ArrayList<>(elements.length);
-        for (T u : elements) {
-            myList.add(u);
-        }
-        return myList;
+        return newArrayList(elements);
     }
 
     /**
@@ -123,26 +121,34 @@ public class CollectUtil {
      * @throws ClassCastException if any iterable contains elements that are not
      *         <i>mutually comparable</i> (for example, strings and integers)
       *
-     * @param iterable
+     * @param collections array of Iterable
      * @return an new ArrayList
      */
     @SafeVarargs
-    public static <ITERABLE extends Iterable<E>, E> List<E> newSortedList(ITERABLE... iterable) {
-        List<E> myList = new ArrayList<>(32 * iterable.length);
-        for (Iterable<E> t : iterable) {
-            Iterator<E> it = t.iterator();
-            while (it.hasNext()) {
-                myList.add(it.next());
+    public static <ITERABLE extends Iterable<T>, T> List<T> newSortedList(ITERABLE... collections) {
+        checkNotNull(collections);
+        checkNotContainNullElement(collections);
+        int sizeOfList = 0;
+        for (Iterable<T> collection : collections){
+            if (collection instanceof List){
+                sizeOfList += ((List<T>) collection).size();
+            }else if (collection instanceof Set){
+                sizeOfList += ((Set<T>) collection).size();
+            }else if (collection instanceof Queue){
+                sizeOfList += ((Queue<T>) collection).size();
+            }else{
+               Check.checkArg(false, "%s[%s] is not supported.", collection.getClass().getSimpleName(), collection);
             }
         }
-        Object[] myArray = myList.toArray();
-        Arrays.sort(myArray);
-        ListIterator<E> i = myList.listIterator();
-        for (int j = 0; j < myArray.length; j++) {
-            i.next();
-            i.set((E) myArray[j]);
+        List<T> myList = new ArrayList<>(sizeOfList);
+        for (Iterable<T> collection : collections) {
+            for (T aT : collection) {
+                myList.add(aT);
+            }
         }
-        return myList;
+        T[] myArray = (T[])myList.toArray();
+        Arrays.sort(myArray);
+        return newArrayList(myArray);
     }
 }
 

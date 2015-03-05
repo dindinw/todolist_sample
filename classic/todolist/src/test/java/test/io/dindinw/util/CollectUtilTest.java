@@ -4,7 +4,6 @@ import static io.dindinw.util.CollectUtil.asImmutableSortedList;
 import static io.dindinw.util.CollectUtil.newArrayList;
 import static io.dindinw.util.CollectUtil.newSortedList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -80,21 +79,24 @@ public class CollectUtilTest {
     public void test_newSortedList() {
         assertEquals("1_text",newSortedList("alex","wu","1_text").get(0)); //[1_text, alex, wu]
         assertTrue(3 == newSortedList(1,2,3).get(2)); // [1,2,3]
-        List<String> list1 = Arrays.asList("one", "two", "three");
-        List<String> list2 = Arrays.asList("4", "5");
 
-        assertEquals("one",newSortedList(list1).get(0)); //[one, three, two]
-        assertEquals("4",newSortedList(list1, list2).get(0)); //[4, 5, one, three, two] 
-        
         Set<String> mySet = new HashSet<>();
         mySet.addAll(Arrays.asList("W","Y","D"));
         assertEquals("D",newSortedList(mySet).get(0)); //[D,W,Y]
-    }
+
+        List<String> list1 = Arrays.asList("one", "two", "three");
+        List<String> list2 = newArrayList("4", "5");
+
+        assertEquals("one",newSortedList(list1).get(0)); //[one, three, two]
+        assertEquals("the first one should be 4","4",newSortedList(list1, list2).get(0)); //[4, 5, one, three, two]
+        assertEquals("the size should be 5",list1.size()+list2.size(), newSortedList(list1,list2).size());
+
+   }
     
 
     @Test
     public void test_newSortedList_throw_CastingException(){
-        List myList = new ArrayList<>();
+        List<Object> myList = new ArrayList<>();
         myList.add("2");
         myList.add(1);
         /**
@@ -106,6 +108,17 @@ public class CollectUtilTest {
         thrown.expect(ClassCastException.class);
         thrown.expectMessage("java.lang.String cannot be cast to java.lang.Integer");
         newSortedList(myList);
+    }
+
+    @Test
+    public void test_newStoredList_twoList_CastingException(){
+       List<Object> list3 = newArrayList(new Object[] {4, "5"});
+        assertEquals(4, list3.get(0));
+        assertEquals("5",list3.get(1));
+        List<Object> list4 = newArrayList(new Object[] {});
+        thrown.expect(ClassCastException.class); //can't compare integer with string
+        newSortedList(list3,list4);
+
     }
 
     @Test
