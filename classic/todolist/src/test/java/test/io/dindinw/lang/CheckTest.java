@@ -155,7 +155,7 @@ public class CheckTest {
     @Test
     public void test_checkElementsNotEmpty_emptyArray(){
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("empty String[]");
+        thrown.expectMessage("input String[] should not be empty");
         Check.checkNotContainEmptyElement(new String[]{}); // the 2nd is empty
         
     }
