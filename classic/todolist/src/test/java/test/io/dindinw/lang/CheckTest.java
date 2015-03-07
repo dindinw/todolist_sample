@@ -160,5 +160,18 @@ public class CheckTest {
         
     }
 
+    @Test
+    public void testStringChecker(){
+        assertTrue(Check.getChecker(Check.StringChecker.class) instanceof Check.StringChecker);
+        assertFalse(Check.getChecker(Check.StringChecker.class).isLetter("1"));
+        assertFalse(Check.getChecker(Check.StringChecker.class).isLetter("124"));
+        assertTrue(Check.getChecker(Check.StringChecker.class).isLetter("A"));
+    }
+
+    @Test
+    public void testNumberChecker(){
+        assertTrue(Check.getChecker(Check.NumberChecker.class) instanceof Check.NumberChecker);
+    }
+
    
 }
