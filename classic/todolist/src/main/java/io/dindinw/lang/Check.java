@@ -13,64 +13,68 @@ import java.util.Objects;
  */
 public final class Check {
     private Check() {}
-    
-    public static void checkArg(boolean exp,String errMsg){
-        checkArg(exp,errMsg,"");
+
+    public static void checkArg(boolean exp,String errMsgTemplate, Object... errMsgArgs) throws IllegalArgumentException{
+        _checkArg(exp,errMsgTemplate,errMsgArgs);
+
     }
-    public static void checkArg(boolean exp,String errMsgTemplate, Object... errMsgArgs){
+    private static void _checkArg(boolean exp,String errMsgTemplate, Object... errMsgArgs) throws IllegalArgumentException{
+        errMsgTemplate = String.valueOf(errMsgTemplate); //in case null->"null"
         if (!exp){
             throw new IllegalArgumentException(String.format(errMsgTemplate, errMsgArgs));
         }
     }
-    public static <T> void checkNotNull(T input) {
-        checkNotNull(input,"","");
+
+    public static <T> void checkNotNull(T input) throws NullPointerException {
+        _checkNotNull(input, "");
     }
-    public static <T> void checkNotNull(T input, String errMsg) {
-        checkNotNull(input,errMsg,"");
+    public static <T> void checkNotNull(T input, String errMsgTemplate, Object ... errMsgArgs) throws NullPointerException {
+        _checkNotNull(input,errMsgTemplate,errMsgArgs);
     }
-    public static <T> void checkNotNull(T input, String errMsgTemplate, Object ... errMsgArgs) {
-        errMsgTemplate = String.valueOf(errMsgTemplate); // null -> "null"
+    private static <T> void _checkNotNull(T input, String errMsgTemplate, Object ... errMsgArgs) throws NullPointerException {
+        errMsgTemplate = String.valueOf(errMsgTemplate); // in case null -> "null"
         Objects.requireNonNull(input, String.format(errMsgTemplate, errMsgArgs));
     }
     
-    public static <T> void checkNotEmpty(T[] array){
-        checkNotNull(array);
-        checkNotEmpty(array,"empty %s",array.getClass().getSimpleName());
+    public static <T> void checkNotEmpty(T[] array) throws NullPointerException,IllegalArgumentException{
+        _checkNotNull(array,"input array should not be null");
+        _checkNotEmpty(array, "empty %s", array.getClass().getSimpleName());
     }
-    public static <T> void checkNotEmpty(T[] array,String errMsg){
-        checkNotEmpty(array,errMsg,"");
+    public static <T> void checkNotEmpty(T[] array,String errMsgTemplate, Object ... errMsgArgs) throws NullPointerException, IllegalArgumentException{
+        _checkNotNull(array,errMsgTemplate,errMsgArgs);
+        _checkNotEmpty(array,errMsgTemplate,errMsgArgs);
     }
-    public static <T> void checkNotEmpty(T[] array,String errMsgTemplate, Object ... errMsgArgs){
+    private static <T> void _checkNotEmpty(T[] array, String errMsgTemplate, Object... errMsgArgs) throws NullPointerException,IllegalArgumentException{
         checkArg(array.length > 0,errMsgTemplate,errMsgArgs);
     }
     
     public static <T extends Iterable<?>> void checkNotEmpty(T iterable ){
-        checkNotNull(iterable);
-        checkNotEmpty(iterable, "empty %s",iterable.getClass().getSimpleName());
+        _checkNotNull(iterable, "input iterable should not be null");
+        _checkNotEmpty(iterable, "empty %s",iterable.getClass().getSimpleName());
     }
-    
-    public static <T extends Iterable<?>> void checkNotEmpty(T iterable ,String errMsg) {
-        checkNotEmpty(iterable,errMsg,"");
-    }
-    
     public static <T extends Iterable<?>> void checkNotEmpty(T iterable ,String errMsgTemplate, Object ... errMsgArgs) {
-        checkNotNull(iterable);
+        _checkNotNull(iterable, errMsgTemplate,errMsgArgs);
+        _checkNotEmpty(iterable,errMsgTemplate,errMsgArgs);
+    }
+    private static <T extends Iterable<?>> void _checkNotEmpty(T iterable ,String errMsgTemplate, Object ... errMsgArgs) throws NullPointerException, IllegalArgumentException {
         Iterator<?> iterator = iterable.iterator();
         checkArg(iterator.hasNext(), errMsgTemplate,errMsgArgs);
     }
-    
+
     public static void checkNotEmpty(String input){
-        checkNotEmpty(input,"","");
-    }
-    public static void checkNotEmpty(String input, String errMsg){
-        checkNotEmpty(input,errMsg,"");
+        _checkNotNull(input,"input string should not be null");
+        _checkNotEmpty(input,"input string should not be empty");
     }
     public static void checkNotEmpty(String input, String errMsgTemplate, Object ... errMsgArgs) {
-        checkNotNull(input,errMsgTemplate, errMsgArgs);
+        _checkNotNull(input,errMsgTemplate, errMsgArgs);
+        _checkNotEmpty(input,errMsgTemplate,errMsgArgs);
+    }
+    private static void _checkNotEmpty(String input, String errMsgTemplate, Object ... errMsgArgs) {
         if (input.equals("")) {
             throw new IllegalArgumentException(String.format(errMsgTemplate, errMsgArgs));
         }
     }
+
     
     /**
      * 
