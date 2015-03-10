@@ -32,10 +32,11 @@ public class Option {
         this(name,null,description);
     }
     public Option(String name, String longName, String description) {
-        this(name,longName,description,OptionType.BooleanOption,true,false,0);
+        this(name,longName,description,OptionType.SimpleOption,true,false,0);
     }
     private Option(String name,String longName,String description,OptionType type,boolean isRequired, boolean hasArg, int numberOfArgs){
         //TODO Check Args
+        checkNotEmpty(name, "Option : name should not be empty");
         this.name=name;
         this.longName=longName;
         this.description=description;
@@ -50,7 +51,7 @@ public class Option {
     private Option(final PropertyOptionBuilder builder){
         this(builder._name,builder._longName,builder._desc,OptionType.PropertyOption,builder._isRequired,true, 1);
     }
-    private Option(final BooleanOptionBuilder builder) {
+    private Option(final SimpleOptionBuilder builder) {
         this(builder._name,builder._longName);
     }
 
@@ -60,7 +61,9 @@ public class Option {
     public static PropertyOptionBuilder propertyOption(){
         return new PropertyOptionBuilder();
     }
-
+    public static SimpleOptionBuilder simpleOption(){
+        return new SimpleOptionBuilder();
+    }
     public static abstract class OptionBuilder {
         protected String _name;
         protected String _longName;
@@ -75,19 +78,24 @@ public class Option {
             return this;
         }
         public OptionBuilder name(String name) {
-            checkNotEmpty(name, "Option name should not be empty");
             //checkArg(getChecker(Check.StringChecker.class, name).isLetter(),"Option name should be a letter char");
             this._name=name;
             return this;
         }
-        abstract public Option build();
+        abstract public Option build() throws IllegalArgumentException;
     }
     public static class ArgumentOptionBuilder extends OptionBuilder {
+        private final int DEFAULT_NUMBER_OF_ARGS=1;
         public boolean _isRequired;
-        public int _numberOfArgs;
+        public int _numberOfArgs=DEFAULT_NUMBER_OF_ARGS;
         @Override
         public Option build() {
             return new Option(this);
+        }
+        public ArgumentOptionBuilder setNumberOfArgs(int numberOfArgs){
+            checkArg(numberOfArgs<=0,"numberOfArgs at least one");
+            this._numberOfArgs=numberOfArgs;
+            return this;
         }
     }
     public static class PropertyOptionBuilder extends OptionBuilder {
@@ -97,14 +105,14 @@ public class Option {
             return new Option(this);
         }
     }
-    public static class BooleanOptionBuilder extends OptionBuilder {
+    public static class SimpleOptionBuilder extends OptionBuilder {
         @Override
         public Option build() {
             return new Option(this);
         }
     }
-    enum OptionType{
-       BooleanOption,
+    public enum OptionType{
+       SimpleOption,
        ArgumentOption,
        PropertyOption
     }

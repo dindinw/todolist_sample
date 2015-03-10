@@ -26,14 +26,14 @@ public class CollectUtilTest {
     
     @Test
     public void test_asImmutableSortedList_nullSet(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         Set<String> nullSet = null;
         asImmutableSortedList(nullSet);
     }
 
     @Test
     public void test_asImmutableSortedList_setWithNullElements(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         Set<String> nullSet = new HashSet<>();
         nullSet.add(null);
         asImmutableSortedList(nullSet);
@@ -41,7 +41,7 @@ public class CollectUtilTest {
 
     @Test
     public void test_asImmutableSortedList_setContainsNullElements(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         Set<String> nullSet = new HashSet<>();
         nullSet.add("first");
         nullSet.add("2nd");
@@ -51,20 +51,20 @@ public class CollectUtilTest {
     }
     @Test
     public void test_asImmutableSortedList_nullArray(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         String[] nullArray = null;
         asImmutableSortedList(nullArray);
     }
     @Test
     public void test_asImmutableSortedList_arrayWithNullElements(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("at index [0]");
         asImmutableSortedList(null, null);
     }
 
     @Test
     public void test_asImmutableSortedList_arrayContainNull(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("at index [1]");
         asImmutableSortedList("not_null",null);
     }
@@ -123,7 +123,7 @@ public class CollectUtilTest {
 
     @Test
     public void test_newArrayList_null(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("input elements array can't be null");
         newArrayList((Object[]) null);
     }

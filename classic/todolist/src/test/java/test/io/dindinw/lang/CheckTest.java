@@ -46,26 +46,26 @@ public class CheckTest {
     
     @Test
     public void test_CheckNull_1null(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         Check.checkNotNull(null);
     }
     
     @Test
     public void test_CheckNull_1nullMsg(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("null");  //notice the output
         Check.checkNotNull(null,null);
     }
     
     @Test
     public void test_CheckNull_1nullMsg_varargs(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("some thing null, some thing not_null");
         Check.checkNotNull(null,"some thing %s, some thing %s",null,"not_null"); 
     }
     @Test
     public void test_CheckNull_2SimpleErrorMessage(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Input should not be null");
         Check.checkNotNull(null,"Input should not be null");
     }
@@ -73,7 +73,7 @@ public class CheckTest {
     @Test
     public void test_CheckNull_3FormattedErrorMessage(){
         Object input=null;
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("[input=null] should not be null");
         Check.checkNotNull(input,"[%s=%s] should not be null","input",input);
     }
@@ -92,7 +92,7 @@ public class CheckTest {
         String input=null;
         String errorMsg="[%s] should not be null";
         String errorArg="input";
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("[input] should not be null");
         Check.checkNotEmpty(input, errorMsg, errorArg);
     }
@@ -111,28 +111,28 @@ public class CheckTest {
     
     @Test
     public void test_checkElementsNotNull_1array_1(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("at index [1]"); 
         Check.checkNotContainNullElement(new Object[]{"alex",null,"wu"}); //the 2nd is null
     }
     
     @Test
     public void test_checkElementsNotNull_1array_2(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("at index [1]"); 
         Check.checkNotContainNullElement(new Object[]{"",null}); //the 2nd is null
     }
     
     @Test
     public void test_checkElementsNotNull_2list(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         List<String> myList = Arrays.asList("alex",null,"wu");
         Check.checkNotContainNullElement(myList); //the 2nd is null
     }
     
     @Test
     public void test_checkElementsNotNull_3Set(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         Set<String> mySet = new HashSet<>();
         mySet.addAll(Arrays.asList("alex",null,"wu"));
         Check.checkNotContainNullElement(mySet); //the 2nd is null
@@ -141,7 +141,7 @@ public class CheckTest {
     
     @Test
     public void test_checkNullElement(){
-        thrown.expect(NullPointerException.class);
+        thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("at index [0]"); 
         Check.checkNotContainNullElement(new Object[]{null,"alex","wu"}, 0); //the 1nd is null
     }

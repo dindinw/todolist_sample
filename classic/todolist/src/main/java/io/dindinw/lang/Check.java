@@ -25,51 +25,51 @@ public final class Check {
         }
     }
 
-    public static <T> void checkNotNull(T input) throws NullPointerException {
-        _checkNotNull(input, "");
+    public static <T> void checkNotNull(T input) throws IllegalArgumentException {
+        _checkNotNull(input, "must not be null");
     }
-    public static <T> void checkNotNull(T input, String errMsgTemplate, Object ... errMsgArgs) throws NullPointerException {
+    public static <T> void checkNotNull(T input, String errMsgTemplate, Object ... errMsgArgs) throws IllegalArgumentException {
         _checkNotNull(input,errMsgTemplate,errMsgArgs);
     }
-    private static <T> void _checkNotNull(T input, String errMsgTemplate, Object ... errMsgArgs) throws NullPointerException {
+    private static <T> void _checkNotNull(T input, String errMsgTemplate, Object ... errMsgArgs) throws IllegalArgumentException {
         errMsgTemplate = String.valueOf(errMsgTemplate); // in case null -> "null"
-        Objects.requireNonNull(input, String.format(errMsgTemplate, errMsgArgs));
+        _checkArg(input==null,errMsgTemplate,errMsgArgs);
     }
     
-    public static <T> void checkNotEmpty(T[] array) throws NullPointerException,IllegalArgumentException{
+    public static <T> void checkNotEmpty(T[] array) throws IllegalArgumentException{
         _checkNotNull(array,"input array should not be null");
         _checkNotEmpty(array, "empty %s", array.getClass().getSimpleName());
     }
-    public static <T> void checkNotEmpty(T[] array,String errMsgTemplate, Object ... errMsgArgs) throws NullPointerException, IllegalArgumentException{
+    public static <T> void checkNotEmpty(T[] array,String errMsgTemplate, Object ... errMsgArgs) throws IllegalArgumentException{
         _checkNotNull(array,errMsgTemplate,errMsgArgs);
         _checkNotEmpty(array,errMsgTemplate,errMsgArgs);
     }
-    private static <T> void _checkNotEmpty(T[] array, String errMsgTemplate, Object... errMsgArgs) throws NullPointerException,IllegalArgumentException{
+    private static <T> void _checkNotEmpty(T[] array, String errMsgTemplate, Object... errMsgArgs) throws IllegalArgumentException{
         _checkArg(array.length == 0, errMsgTemplate, errMsgArgs);
     }
     
-    public static <T extends Iterable<?>> void checkNotEmpty(T iterable ){
+    public static <T extends Iterable<?>> void checkNotEmpty(T iterable ) throws IllegalArgumentException{
         _checkNotNull(iterable, "input iterable should not be null");
         _checkNotEmpty(iterable, "empty %s",iterable.getClass().getSimpleName());
     }
-    public static <T extends Iterable<?>> void checkNotEmpty(T iterable ,String errMsgTemplate, Object ... errMsgArgs) {
+    public static <T extends Iterable<?>> void checkNotEmpty(T iterable ,String errMsgTemplate, Object ... errMsgArgs) throws IllegalArgumentException{
         _checkNotNull(iterable, errMsgTemplate,errMsgArgs);
         _checkNotEmpty(iterable,errMsgTemplate,errMsgArgs);
     }
-    private static <T extends Iterable<?>> void _checkNotEmpty(T iterable ,String errMsgTemplate, Object ... errMsgArgs) throws NullPointerException, IllegalArgumentException {
+    private static <T extends Iterable<?>> void _checkNotEmpty(T iterable ,String errMsgTemplate, Object ... errMsgArgs) throws  IllegalArgumentException {
         Iterator<?> iterator = iterable.iterator();
         _checkArg(!iterator.hasNext(), errMsgTemplate, errMsgArgs);
     }
 
-    public static void checkNotEmpty(String input){
+    public static void checkNotEmpty(String input) throws IllegalArgumentException{
         _checkNotNull(input, "input string should not be null");
         _checkNotEmpty(input, "input string should not be empty");
     }
-    public static void checkNotEmpty(String input, String errMsgTemplate, Object ... errMsgArgs) {
+    public static void checkNotEmpty(String input, String errMsgTemplate, Object ... errMsgArgs) throws IllegalArgumentException{
         _checkNotNull(input,errMsgTemplate, errMsgArgs);
         _checkNotEmpty(input,errMsgTemplate,errMsgArgs);
     }
-    private static void _checkNotEmpty(String input, String errMsgTemplate, Object ... errMsgArgs) {
+    private static void _checkNotEmpty(String input, String errMsgTemplate, Object ... errMsgArgs) throws IllegalArgumentException{
         if (input.equals("")) {
             throw new IllegalArgumentException(String.format(errMsgTemplate, errMsgArgs));
         }
@@ -80,7 +80,7 @@ public final class Check {
      * 
      * @see @linktourl http://docs.guava-libraries.googlecode.com/git-history/release/javadoc/src-html/com/google/common/collect/ObjectArrays.html?r=release
      */
-    public static <T> T[] checkNotContainNullElement(T[] elements){
+    public static <T> T[] checkNotContainNullElement(T[] elements) throws IllegalArgumentException{
         _checkNotNull(elements, "input array elements should not be null");
         for (int i = 0 ; i < elements.length; i++){
             _checkElementNotNull(elements,i);
@@ -94,14 +94,14 @@ public final class Check {
      * @param index the index of the array
      * @return the element aka. array[index]
      */
-    public static <T> T checkNotContainNullElement(T[] array, int index){
+    public static <T> T checkNotContainNullElement(T[] array, int index) throws IllegalArgumentException{
         _checkNotNull(array, "input array should not be null");
         _checkIndexInArray(array, index);
         _checkElementNotNull(array,index);
         return array[index];
     }
     
-    public static <T extends Iterable<U>, U> T checkNotContainNullElement(T elements){
+    public static <T extends Iterable<U>, U> T checkNotContainNullElement(T elements) throws IllegalArgumentException{
         _checkNotNull(elements, "input T elements should not be null");
         for (U element : elements) {
             _checkNotNull(element, "%s %s contains null", elements.getClass().getSimpleName(), elements);
@@ -110,7 +110,7 @@ public final class Check {
     }
     
     
-    public static String[] checkNotContainEmptyElement(String[] elements){
+    public static String[] checkNotContainEmptyElement(String[] elements) throws IllegalArgumentException{
         _checkNotNull(elements, "input String[] should not be null");
         _checkNotEmpty(elements, "input String[] should not be empty");
         for (int i = 0 ; i < elements.length; i++){
@@ -119,7 +119,7 @@ public final class Check {
         }
         return elements;
     }
-    public static String checkNotContainEmptyElement(String[] array, int index){
+    public static String checkNotContainEmptyElement(String[] array, int index) throws IllegalArgumentException{
         _checkNotNull(array, "input String[] array should not be null");
         _checkIndexInArray(array, index);
         _checkElementNotNull(array,index);
