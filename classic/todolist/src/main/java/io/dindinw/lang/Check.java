@@ -20,7 +20,7 @@ public final class Check {
     }
     private static void _checkArg(boolean exp,String errMsgTemplate, Object... errMsgArgs) throws IllegalArgumentException{
         errMsgTemplate = String.valueOf(errMsgTemplate); //in case null->"null"
-        if (!exp){
+        if (exp){
             throw new IllegalArgumentException(String.format(errMsgTemplate, errMsgArgs));
         }
     }
@@ -45,7 +45,7 @@ public final class Check {
         _checkNotEmpty(array,errMsgTemplate,errMsgArgs);
     }
     private static <T> void _checkNotEmpty(T[] array, String errMsgTemplate, Object... errMsgArgs) throws NullPointerException,IllegalArgumentException{
-        _checkArg(array.length > 0, errMsgTemplate, errMsgArgs);
+        _checkArg(array.length == 0, errMsgTemplate, errMsgArgs);
     }
     
     public static <T extends Iterable<?>> void checkNotEmpty(T iterable ){
@@ -58,7 +58,7 @@ public final class Check {
     }
     private static <T extends Iterable<?>> void _checkNotEmpty(T iterable ,String errMsgTemplate, Object ... errMsgArgs) throws NullPointerException, IllegalArgumentException {
         Iterator<?> iterator = iterable.iterator();
-        _checkArg(iterator.hasNext(), errMsgTemplate, errMsgArgs);
+        _checkArg(!iterator.hasNext(), errMsgTemplate, errMsgArgs);
     }
 
     public static void checkNotEmpty(String input){
@@ -128,8 +128,8 @@ public final class Check {
     }
 
     private static <T> void _checkIndexInArray(T[] array, int index){
-        _checkArg(index >= 0, "input index [%s] should not be negative.", index);
-        _checkArg(index < array.length, "input index [%s] should not be bigger than array's length [%s].", index, array.length);
+        _checkArg(index < 0, "input index [%s] should not be negative.", index);
+        _checkArg(index > array.length, "input index [%s] should not be bigger than array's length [%s].", index, array.length);
     }
 
     private static <T> void _checkElementNotNull(T[] array, int index){
@@ -139,39 +139,55 @@ public final class Check {
         _checkNotEmpty(stringArray[index], "empty string at index [%s]", index);
     }
 
-    public static <T extends Checker> T getChecker(Class<T> checkerClass) {
-        return (T)Checkers.valueOf(checkerClass.getSimpleName()).get();
+    public static <T extends AbstractChecker, E> T getChecker(Class<T> checkType, E check) {
+        return (T)Checkers.valueOf(checkType.getSimpleName()).check(check);
     }
 
     private enum Checkers{
-        StringChecker(_stringChecker),
-        NumberChecker(_numberChecker);
+        StringChecker(StringChecker.class,_stringChecker),
+        NumberChecker(NumberChecker.class,_numberChecker);
         private Checker _checker;
-        Checkers(Checker checker) {
+        <T extends Checker> Checkers (Class<T> checkClass,T checker) {
             this._checker=checker;
         }
-        Checker get() {
-            return _checker;
+        <T extends AbstractChecker<E>,E> T check(E check) {
+            ((T)_checker).setCheck(check);
+            return (T)_checker;
         }
     }
     private static StringChecker _stringChecker = new StringChecker();
     private static NumberChecker _numberChecker = new NumberChecker();
-    private interface Checker {};
-    public static final class StringChecker implements Checker{
+    private interface Checker<T> {
+    };
+    public static abstract class AbstractChecker<T> implements Checker{
+        protected ThreadLocal<T> _toCheck = new ThreadLocal<>();
+        protected void setCheck(T check){
+            _toCheck.set(check);
+        }
+        protected T getCheck(){
+            return _toCheck.get();
+        }
+    }
+    public static final class StringChecker extends AbstractChecker<String>{
+
         private StringChecker() {};
 
-        public static boolean isSingleChar(String input){
-            return (input!=null&&!input.isEmpty()&&input.length()==1) ? true:false;
+        public boolean isSingleChar(){
+            return (getCheck()!=null&&!getCheck().isEmpty()&&getCheck().length()==1) ? true:false;
         }
-        public static boolean isLetter(String input){
-            if (isSingleChar(input)){
-                return Character.isLetter(input.charAt(0));
+        public boolean isLetter(){
+            if (isSingleChar()){
+                return Character.isLetter(getCheck().charAt(0));
             }
             return false;
         }
+        public StringChecker check(String check) {
+            setCheck(check);
+            return this;
+        }
     }
-    public static final class NumberChecker implements Checker{
-        private NumberChecker() {};
+    public static final class NumberChecker extends AbstractChecker<Number>{
+        private NumberChecker(){};
     }
 
 }

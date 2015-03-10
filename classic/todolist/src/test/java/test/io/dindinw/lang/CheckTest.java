@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +32,7 @@ public class CheckTest {
     public void test_CheckArg_1SimpleErrorMessage(){
         int age=28;
         thrown.expect(IllegalArgumentException.class);
-        Check.checkArg(age>30, "Alex's age should not less than 30");
+        Check.checkArg(age<30, "Alex's age should not less than 30");
     }
     
     @Test
@@ -39,7 +40,7 @@ public class CheckTest {
         int age=28;
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("[alex]'s age should not less than [30]");
-        Check.checkArg(age>30, "[%s]'s age should not less than [%s]","alex",30);
+        Check.checkArg(age<30, "[%s]'s age should not less than [%s]","alex",30);
     }
     
     
@@ -162,15 +163,17 @@ public class CheckTest {
 
     @Test
     public void testStringChecker(){
-        assertTrue(Check.getChecker(Check.StringChecker.class) instanceof Check.StringChecker);
-        assertFalse(Check.getChecker(Check.StringChecker.class).isLetter("1"));
-        assertFalse(Check.getChecker(Check.StringChecker.class).isLetter("124"));
-        assertTrue(Check.getChecker(Check.StringChecker.class).isLetter("A"));
+        Check.StringChecker checker = Check.getChecker(Check.StringChecker.class, "A");
+        assertTrue(checker instanceof Check.StringChecker);
+        assertTrue(checker.check("A").isLetter());
+        assertFalse(checker.check("124").isSingleChar());
+        assertTrue(checker.check("B").isLetter()&&checker.isSingleChar());
+
     }
 
     @Test
     public void testNumberChecker(){
-        assertTrue(Check.getChecker(Check.NumberChecker.class) instanceof Check.NumberChecker);
+        assertTrue(Check.getChecker(Check.NumberChecker.class, 2) instanceof Check.NumberChecker);
     }
 
    
