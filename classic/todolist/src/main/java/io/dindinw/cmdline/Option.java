@@ -79,7 +79,8 @@ public class Option {
         protected String _desc;
         protected boolean _isRequired;
         /** default is 0 */
-        protected int _numberOfArgs=0;
+        protected final int DEFAULT_NUMBER_OF_ARGS=0;
+        protected int _numberOfArgs=DEFAULT_NUMBER_OF_ARGS;
         public OptionBuilder longName(String longName){
             checkNotEmpty(longName, "Option long name should not be empty");
             this._longName = longName;
@@ -102,10 +103,11 @@ public class Option {
         abstract public Option build() throws IllegalArgumentException;
     }
     public static class ArgumentOptionBuilder extends OptionBuilder {
-
         @Override
-        public Option build() { return new Option(this); }
-
+        public Option build() {
+            if (_numberOfArgs==DEFAULT_NUMBER_OF_ARGS) _numberOfArgs=1;
+            return new Option(this);
+        }
         @Override
         public OptionBuilder setNumberOfArgs(int numberOfArgs){
             checkArg(numberOfArgs<=0,"numberOfArgs at least one");
