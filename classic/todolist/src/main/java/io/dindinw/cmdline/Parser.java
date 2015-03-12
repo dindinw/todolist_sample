@@ -20,16 +20,11 @@ public final class Parser {
         /*try{*/
         for( String[] f_args : argsList){
             // like [--o,foo1,foo2]
-            if (f_args[0].startsWith("--")){
-                //f_args[0] = f_args[0].replaceFirst("--","");
-                parseOption(f_args, cmd);
-            }
             // like [-option,foo1,foo2]
-            else if (f_args[0].startsWith("-")){
-                //f_args[0] = f_args[0].replaceFirst("-","");
+            if (_isOption(f_args[0])){
                 parseOption(f_args, cmd);
             }
-            // like [foo]
+            // like [foo], it just a argument
             else{
                 checkArg(f_args.length != 1, "fattening array size should always equal 1 when work as normal argument");
                 cmd.addArg(f_args[0]);
@@ -66,26 +61,72 @@ public final class Parser {
         return flatteningList;
     }
     private boolean _isOption(String arg){
-       return arg.startsWith("--") || arg.startsWith("-");
+       return arg.startsWith("-");
     }
+
+    /*
+    private boolean _isArgOption(String arg){
+       return _isOption(arg)
+               &&findOptionByOptionTypeAndName(this.optionList, Option.OptionType.ArgumentOption,arg)==null;
+    }
+    private boolean _isPropertiesOption(String arg){
+       return _isOption(arg)
+               &&findOptionByOptionTypeAndName(this.optionList, Option.OptionType.PropertyOption,arg)==null;
+    }
+    */
     /*
         fattening args like:
-        [o,foo1,foo2]
-        [option,foo1,foo2]
+        [-o,foo1,foo2]
+        [--option,foo1,foo2]
+        [-Dkey1=value1] : how to parse this?
+           1. check if contains '='
+           2. check if OptionList has properties Option.
+           3. check if match pattern like -<optionName>.*=.* or --<optionLongName>.*=.*
+           4. then parse the string token
      */
     private void parseOption(String[] args,CmdLine cmd) throws Exception {
-        Option o = findOptionByName(this.optionList,args[0]);
-        if (o != null){
-            if (args.length>1&&o.optionType== Option.OptionType.SimpleOption){
+        //when args[0] like "-Dkey1=value1", go to parse propertyOption
+        if (args.length == 1 && args[0].matches(".*=.*")) {
+            parsePropertyOption(args[0], cmd);
+        }
+        //Parse ArgumentOption
+        else {
+            Option o = findOptionByName(this.optionList, args[0]);
+            if (o != null) {
+                // we got multiple option values (args.length > 1) and we find a defined option.
+                // but we don't define it as a option to take values, instead, it is a simpleOption
+                // which should take no value.
+                if (args.length > 1 && o.optionType == Option.OptionType.SimpleOption) {
+                    throw new Exception(String.format(
+                            "SimpleOption: %s can't take values %s ", o, Arrays.asList(args)));
+                }
+                for (int i = 1; i < args.length; i++) {
+                    cmd.addOptionValue(args[0], args[i]);
+                }
+            } else {
                 throw new Exception(String.format(
-                        "SimpleOption: %s can't take values %s ",o,Arrays.asList(args)));
+                        "option '%s' not defined.", args[0]));
             }
-            for (int i=1; i<args.length; i++) {
-                cmd.addOptionValue(args[0], args[i]);
+        }
+    }
+
+    private void parsePropertyOption(String arg, CmdLine cmd){
+        for(Option o : filterOptionByType(this.optionList, Option.OptionType.PropertyOption)){
+            String opt = null;
+            if(arg.matches(o.name+".*=.*")){ //-Dkey1=value1
+               opt = o.name;
+            }else if (arg.matches(o.longName+".*=.*")){ //--Configkey1=value2
+               opt = o.longName;
             }
-        }else{
-            throw new Exception(String.format(
-                    "option '%s' not defined.",args[0]));
+            //matched
+            if (opt!=null){
+                String[] pair  = arg.split("=");
+                String key = pair[0].replaceFirst(opt,"");
+                String value = pair [1];
+                cmd.addOptionValue(opt,key);
+                cmd.addOptionValue(opt,value);
+                //checkArg(true,"go to parse property [%s] -> [%s],[%s] ",arg,key,value);
+            }
         }
     }
 
@@ -97,6 +138,10 @@ public final class Parser {
         optionList.add(option);
     }
 
+    /*
+       The internal logic of OptionList need to might sure one and only one can be found,
+       otherwise return null;
+     */
     static Option findOptionByName(List<Option> optionList, String optionName) {
         for (Option o : optionList){
             if (optionName.equals(o.name) || optionName.equals(o.longName)){
@@ -105,6 +150,19 @@ public final class Parser {
         }
         return null;
     }
+    static List<Option> filterOptionByType(List<Option> optionList, Option.OptionType type){
+        List<Option> newList = new ArrayList<>(optionList.size());
+        for (Option o : optionList){
+            if (o.optionType == type) newList.add(o);
+        }
+        return newList;
+    }
+    /*
+    static Option findOptionByOptionTypeAndName(List<Option> optionList,Option.OptionType optType, String optionName){
+        Option o = findOptionByName(optionList,optionName);
+        return (o!=null&&o.optionType==optType) ? o : null;
+    }
+    */
 }
 
 

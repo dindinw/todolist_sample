@@ -32,7 +32,7 @@ public class ParserTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("'-a' already exists in Option");
         parser.addOption(
-            Option.argOption().name("-a").longName("--print-all").withDesc("print all information").build()
+                Option.argOption().name("-a").longName("--print-all").withDesc("print all information").build()
         );
     }
 
@@ -55,12 +55,28 @@ public class ParserTest {
                 .build());
         parser.addOption(
                 Option.argOption().name("-o")
+                        .longName("--output")
                         .build());
         parser.addOption(Option.simpleOption().name("-d").longName("--Debug").build());
 
-        cmd = parser.parse(new String[]{"-i","input","-o","output","--Debug"});
+        cmd = parser.parse(new String[]{"foo","foo2","-i","input","input2","-o","output","--Debug"});
+        assertArrayEquals(new String[]{"foo","foo2"}, cmd.getArgs());
+        assertArrayEquals(new String[]{"input","input2"},cmd.getOptionValues("-i"));
+        assertEquals("input", cmd.getOptionValue("-i"));
+        assertArrayEquals(new String[]{"output"},cmd.getOptionValues("-o"));
+    }
+
+    @Test
+    public void testParseProperties() throws Exception{
+        Parser parser = new Parser();
+        parser = new Parser();
+        parser.addOption(Option.propertyOption()
+                .name("-D")
+                .withDesc("properties option like -Dkey=value")
+                .build());
+        CmdLine cmd = parser.parse(new String[]{"-Dkey1=value1","-Dkey2=value2"});
         assertArrayEquals(new String[]{}, cmd.getArgs());
-        assertArrayEquals(new String[]{"input"},cmd.getOptionValues("-i"));
-        assertEquals("input",cmd.getOptionValue("-i"));
+        assertArrayEquals(new String[]{"key1","value1","key2","value2"},cmd.getOptionValues("-D"));
+
     }
 }
