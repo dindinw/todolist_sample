@@ -20,8 +20,8 @@ public class OptionTest {
     public void testSimpleOption(){
         Option debug = new Option("Debug","print debug information");
         assertEquals("the default option is simple option",debug.optionType, Option.OptionType.SimpleOption);
-        assertEquals("the option name is","Debug",debug.name);
-        assertEquals("the option long name is same with name if not set","Debug",debug.longName);
+        assertEquals("the option name is","-Debug",debug.name);
+        assertEquals("the option long name is","--Debug",debug.longName);
     }
 
     @Test
@@ -77,8 +77,8 @@ public class OptionTest {
         assertTrue(Option.argOption() instanceof Option.ArgumentOptionBuilder);
         /** -a,-all          print all information*/
         Option all = Option.argOption().name("a").longName("all").withDesc("print all").build();
-        assertEquals("a",all.name);
-        assertEquals("all",all.longName);
+        assertEquals("-a",all.name);
+        assertEquals("--all",all.longName);
         assertEquals("print all",all.description);
         assertTrue("Argument Option always has arg", all.hasArg);
         assertEquals("The default number of args is 1", 1, all.numberOfArgs);

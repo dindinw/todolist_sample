@@ -34,6 +34,20 @@ public class Option {
     public final String longName;
     public final String description;
 
+    @Override
+    public String toString() {
+        return "Option{" +
+                " name='" + name + '\'' +
+                ", longName='" + longName + '\'' +
+                ", description='" + description + '\'' +
+                ", optionType=" + optionType +
+                ", numberOfArgs=" + numberOfArgs +
+                ", hasArg=" + hasArg +
+                ", isRequired=" + isRequired +
+                '}';
+    }
+
+
     /**
      * Create "-debug" option
      * Option option = new Option("debug","print debug information")
@@ -58,8 +72,10 @@ public class Option {
         checkArg(name == null && longName == null, "Option: 'name' and 'longName' both null.");
         checkNotEmpty(name, "Option : 'name' should not be empty");
         checkNotEmpty(longName, "Option : 'longName' should not be empty");
-        this.name=name;
-        this.longName=longName;
+        checkArg(name.startsWith("-"),"Option : 'name' starts with '-'");
+        checkArg(longName.startsWith("-"),"Option : 'longName' starts with '-'");
+        this.name="-"+name;
+        this.longName="--"+longName;
         this.description=description;
         this.optionType=type;
         this.hasArg=hasArg;
@@ -73,7 +89,7 @@ public class Option {
         this(builder._name,builder._longName,builder._desc,OptionType.PropertyOption,builder._isRequired,true, 1);
     }
     private Option(final SimpleOptionBuilder builder) {
-        this(builder._name,builder._longName);
+        this(builder._name,builder._longName,builder._desc);
     }
 
     public static ArgumentOptionBuilder argOption(){

@@ -48,12 +48,7 @@ public class CmdLine {
         return (_findOptionByName(optionName)==null) ? false : true ;
     }
     private Option _findOptionByName(String optionName) {
-        for (Option o : optionList){
-            if (optionName.equals(o.name) || optionName.equals(o.longName)){
-                return o;
-            }
-        }
-        return null;
+        return Parser.findOptionByName(optionList,optionName);
     }
 
     /**
@@ -66,7 +61,7 @@ public class CmdLine {
         if (o!=null){
             if (optionValues.containsKey(o.name)){
                 List<String> optValues = optionValues.get(o.name);
-                optValues.toArray(new String[optValues.size()]);
+                return optValues.toArray(new String[optValues.size()]);
             }
         }
         return new String[]{};
