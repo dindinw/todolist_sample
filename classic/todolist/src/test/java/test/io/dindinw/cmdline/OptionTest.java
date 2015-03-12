@@ -18,10 +18,13 @@ public class OptionTest {
 
     @Test
     public void testSimpleOption(){
-        Option debug = new Option("Debug","print debug information");
-        assertEquals("the default option is simple option",debug.optionType, Option.OptionType.SimpleOption);
-        assertEquals("the option name is","-Debug",debug.name);
-        assertEquals("the option long name is","--Debug",debug.longName);
+        Option debug = new Option("-Debug","print debug information");
+        assertEquals("-Debug",debug.name);
+        assertEquals("--Debug",debug.longName);
+        assertEquals(0,debug.numberOfArgs);
+        assertEquals(false,debug.hasArg);
+        assertEquals(true,debug.isRequired);
+        assertEquals(Option.OptionType.SimpleOption,debug.optionType);
     }
 
     @Test
@@ -34,7 +37,21 @@ public class OptionTest {
         thrown.expect(IllegalArgumentException.class);
         Option debug = new Option(null,"print debug information");
     }
-
+    @Test
+    public void testSimpleOption_notValidName(){
+        thrown.expect(IllegalArgumentException.class);
+        Option foo = new Option("foo","foo information");
+    }
+    @Test
+    public void testSimpleOption_notValidName2(){
+        thrown.expect(IllegalArgumentException.class);
+        Option foo = new Option("--foo","foo information");
+    }
+    @Test
+    public void testSimpleOption_notValidName3(){
+        thrown.expect(IllegalArgumentException.class);
+        Option foo = new Option("-f","-foo","foo information");
+    }
     @Test
     public void testSimpleOptionBuilder_illegalArgs_nullNull(){
         thrown.expect(IllegalArgumentException.class);
@@ -57,13 +74,7 @@ public class OptionTest {
     public void testSimpleOptionBuilder_illegalArgs_okEmpty(){
         thrown.expect(IllegalArgumentException.class);
        // ok, empty
-        Option some = Option.simpleOption().name("some").longName("").build();
-    }
-    @Test
-    public void testSimpleOptionBuilder_illegalArgs_okNull(){
-        thrown.expect(IllegalArgumentException.class);
-       // ok, null
-        Option some2 = Option.simpleOption().name("some").longName(null).build();
+        Option some = Option.simpleOption().name("-some").longName("").build();
     }
     @Test
     public void testSimpleOptionBuilder_setNumberOfArgs(){
@@ -76,18 +87,18 @@ public class OptionTest {
         assertTrue(Option.argOption() instanceof Option.OptionBuilder);
         assertTrue(Option.argOption() instanceof Option.ArgumentOptionBuilder);
         /** -a,-all          print all information*/
-        Option all = Option.argOption().name("a").longName("all").withDesc("print all").build();
+        Option all = Option.argOption().name("-a").longName("--all").withDesc("print all").build();
         assertEquals("-a",all.name);
         assertEquals("--all",all.longName);
         assertEquals("print all",all.description);
-        assertTrue("Argument Option always has arg", all.hasArg);
-        assertEquals("The default number of args is 1", 1, all.numberOfArgs);
-
+        assertEquals(Option.OptionType.ArgumentOption,all.optionType);
+        assertEquals(true,all.hasArg);
+        assertEquals(1, all.numberOfArgs);
     }
 
     @Test
     public void testArgumentOptionBuilder_setNumberOfArgs(){
-        Option F = Option.argOption().setNumberOfArgs(2).name("F").longName("file").withDesc("print all").build();
+        Option F = Option.argOption().setNumberOfArgs(2).name("-F").longName("--file").withDesc("print all").build();
         assertEquals(2,F.numberOfArgs);
         thrown.expect(IllegalArgumentException.class);
         Option.argOption().setNumberOfArgs(0).name("F").longName("file").withDesc("print all").build();
@@ -95,7 +106,7 @@ public class OptionTest {
 
     @Test
     public void testPropertyOptionBuilder_setNumberOfArgs(){
-        Option D = Option.propertyOption().name("D").build();
+        Option D = Option.propertyOption().name("-D").build();
         //can't set args for property option
         thrown.expect(UnsupportedOperationException.class);
         Option.propertyOption().name("E").setNumberOfArgs(1);

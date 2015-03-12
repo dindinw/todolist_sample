@@ -27,20 +27,20 @@ public class ParserTest {
         Parser parser = new Parser();
 
         parser.addOption(
-                Option.argOption().name("a").longName("all").withDesc("print all information").build()
+                Option.argOption().name("-a").longName("--all").withDesc("print all information").build()
         );
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("Option : '-a' already exists");
+        thrown.expectMessage("'-a' already exists in Option");
         parser.addOption(
-            Option.argOption().name("a").longName("print-all").withDesc("print all information").build()
+            Option.argOption().name("-a").longName("--print-all").withDesc("print all information").build()
         );
     }
 
     @Test
     public void testParser() throws Exception {
         Parser parser = new Parser();
-        parser.addOption(new Option("a", "all", "print all file"));
-        parser.addOption(new Option("d", "Debug", "debug option"));
+        parser.addOption(new Option("-a", "--all", "print all file"));
+        parser.addOption(new Option("-d", "--Debug", "debug option"));
         CmdLine cmd = parser.parse(new String[]{"clean", "install", "-a", "--Debug", "foo1"});
         assertArrayEquals(new String[]{"clean", "install", "foo1"}, cmd.getArgs());
         assertTrue(cmd.hasOption("-a"));
@@ -48,15 +48,15 @@ public class ParserTest {
 
         parser = new Parser();
         parser.addOption(Option.argOption()
-                .name("i")
-                .longName("input")
+                .name("-i")
+                .longName("--input")
                 .withDesc("input file")
                 .setNumberOfArgs(1)
                 .build());
         parser.addOption(
-                Option.argOption().name("o")
+                Option.argOption().name("-o")
                         .build());
-        parser.addOption(Option.simpleOption().longName("Debug").build());
+        parser.addOption(Option.simpleOption().name("-d").longName("--Debug").build());
 
         cmd = parser.parse(new String[]{"-i","input","-o","output","--Debug"});
         assertArrayEquals(new String[]{}, cmd.getArgs());

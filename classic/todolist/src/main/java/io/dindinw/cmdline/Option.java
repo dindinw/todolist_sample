@@ -50,40 +50,54 @@ public class Option {
 
     /**
      * Create "-debug" option
-     * Option option = new Option("debug","print debug information")
+     * Option option = new Option("-debug","print debug information")
      *
-     * @param name
+     * @param name starts with '-'
      * @param description
      */
     public Option(String name, String description){
-       this(name, name, description);
+       this(name, "-"+name, description);;
     }
+
+    /**
+     * Create "-d --debug" option
+     *
+     * Option option = new Option("-d","--debug","print debug information")
+     * @param name starts with '-'
+     * @param longName starts with '--'
+     * @param description
+     */
     public Option(String name, String longName, String description) {
-        this(name,longName,description,OptionType.SimpleOption,true,false,0);
+       this(name,longName,description,OptionType.SimpleOption,true,false,0);
     }
+
     private Option(String name,String longName,String description,OptionType type,boolean isRequired, boolean hasArg, int numberOfArgs){
-        //TODO Check Args
-        if(name==null&&longName!=null){
-            name=longName;
-        }
-        if(name!=null&&longName==null){
-            longName=name;
-        }
-        checkArg(name == null && longName == null, "Option: 'name' and 'longName' both null.");
-        checkNotEmpty(name, "Option : 'name' should not be empty");
-        checkNotEmpty(longName, "Option : 'longName' should not be empty");
-        checkArg(name.startsWith("-"),"Option : 'name' starts with '-'");
-        checkArg(longName.startsWith("-"),"Option : 'longName' starts with '-'");
-        this.name="-"+name;
-        this.longName="--"+longName;
+        // both null
+        checkArg(name==null&&longName==null,"'name' and 'longName' both null");
+        // name is null,
+        if(name==null) name=longName.replaceFirst("--","-");
+        // longName is null
+        if(longName==null) longName=name.replaceFirst("-","--");
+
+        checkNotEmpty(name, "'name' should not be empty");
+        checkNotEmpty(longName, "'longName' should not be empty");
+
+        checkArg(!name.startsWith("-")
+                        ||name.startsWith("--")
+                        ||!longName.startsWith("--"),
+                "Failed to create Option, 'name' should start with '-' and 'longName' should start with '--'. [name=%s,longName=%s]",name,longName);
+
+        this.name=name;
+        this.longName=longName;
         this.description=description;
         this.optionType=type;
         this.hasArg=hasArg;
         this.isRequired=isRequired;
-        this.numberOfArgs=numberOfArgs;
+        this.numberOfArgs = numberOfArgs;
     }
-    private Option(final ArgumentOptionBuilder builder){
-        this(builder._name,builder._longName,builder._desc,OptionType.ArgumentOption,builder._isRequired,true, builder._numberOfArgs);
+
+    private Option(final ArgumentOptionBuilder builder) {
+        this(builder._name, builder._longName,builder._desc,OptionType.ArgumentOption,builder._isRequired,true, builder._numberOfArgs);
     }
     private Option(final PropertyOptionBuilder builder){
         this(builder._name,builder._longName,builder._desc,OptionType.PropertyOption,builder._isRequired,true, 1);
@@ -110,7 +124,6 @@ public class Option {
         protected final int DEFAULT_NUMBER_OF_ARGS=0;
         protected int _numberOfArgs=DEFAULT_NUMBER_OF_ARGS;
         public OptionBuilder longName(String longName){
-            checkNotEmpty(longName, "Option long name should not be empty");
             this._longName = longName;
             return this;
         }
@@ -119,7 +132,6 @@ public class Option {
             return this;
         }
         public OptionBuilder name(String name) {
-            //checkArg(getChecker(Check.StringChecker.class, name).isLetter(),"Option name should be a letter char");
             this._name=name;
             return this;
         }
@@ -146,7 +158,7 @@ public class Option {
     public static class PropertyOptionBuilder extends OptionBuilder {
         @Override
         public OptionBuilder setNumberOfArgs(int numberOfArgs) {
-            throw new UnsupportedOperationException("Option: 'numberOfArgs' is fixed to 2 for PropertyOption");
+            throw new UnsupportedOperationException("Option: 'numberOfArgs' is fixed to 1 for PropertyOption");
         }
         @Override
         public Option build() {
@@ -159,9 +171,7 @@ public class Option {
             throw new UnsupportedOperationException("Option: 'numberOfArgs' is fixed to 0 for SimpleOption");
         }
         @Override
-        public Option build() {
-            return new Option(this);
-        }
+        public Option build() { return new Option(this); }
     }
     public enum OptionType{
        SimpleOption,
