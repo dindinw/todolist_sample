@@ -72,11 +72,11 @@ public class ParserTest {
         parser = new Parser();
         parser.addOption(Option.propertyOption()
                 .name("-D")
-                .withDesc("properties option like -Dkey=value")
+                .withDesc("Java properties option like -Dkey=value")
                 .build());
-        CmdLine cmd = parser.parse(new String[]{"-Dkey1=value1","-Dkey2=value2"});
-        assertArrayEquals(new String[]{}, cmd.getArgs());
-        assertArrayEquals(new String[]{"key1","value1","key2","value2"},cmd.getOptionValues("-D"));
+        CmdLine cmd = parser.parse(new String[]{"mvn","clean","install","-DskipTests=true","-Dbuild=myProfile"});
+        assertArrayEquals(new String[]{"mvn","clean","install"}, cmd.getArgs());
+        assertArrayEquals(new String[]{"skipTests","true","build","myProfile"},cmd.getOptionValues("-D"));
 
     }
 }
