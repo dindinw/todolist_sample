@@ -1,6 +1,7 @@
 package io.dindinw.cmdline;
 
 import static io.dindinw.lang.Check.checkArg;
+import static io.dindinw.lang.Check.checkState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,15 +15,20 @@ public final class Parser {
 
     List<Option> optionList = new ArrayList<>();
 
+    /**
+     * Parse the input arguments array.
+     * @param args
+     * @return
+     * @throws Exception
+     */
     public CmdLine parse(String[] args) throws Exception{
         CmdLine cmd = new CmdLine(optionList);
-        List<String[]> argsList = argsToFlatteningList(args);
-        /*try{*/
+        List<String[]> argsList = _argsToFlatteningList(args);
         for( String[] f_args : argsList){
             // like [--o,foo1,foo2]
             // like [-option,foo1,foo2]
             if (_isOption(f_args[0])){
-                parseOption(f_args, cmd);
+                _parseOption(f_args, cmd);
             }
             // like [foo], it just a argument
             else{
@@ -30,15 +36,19 @@ public final class Parser {
                 cmd.addArg(f_args[0]);
             }
         }
-        /*}catch(Exception e){
-            throw new Exception(String.format(
-                    "Parse Error for command line args %s. %s",Arrays.asList(args),e.getMessage()));
-        }
-        */
         return cmd;
     }
 
-    private List<String[]> argsToFlatteningList(String[] args) {
+    private boolean _isOption(String arg){
+       return arg.startsWith("-");
+    }
+
+    /*
+      The method convert the input args[] into the flatten list of args.
+      Ex:
+      [-i,inputfile,-o,outputfile,--debug] -> {[-i,inputfile],[-o,outputfile],[--debug]}
+     */
+    private List<String[]> _argsToFlatteningList(String[] args) {
         List<String[]> flatteningList = new ArrayList<>();
         for (int i = 0; i < args.length; i++) {
             if (_isOption(args[i])){
@@ -60,34 +70,17 @@ public final class Parser {
         }
         return flatteningList;
     }
-    private boolean _isOption(String arg){
-       return arg.startsWith("-");
-    }
 
     /*
-    private boolean _isArgOption(String arg){
-       return _isOption(arg)
-               &&findOptionByOptionTypeAndName(this.optionList, Option.OptionType.ArgumentOption,arg)==null;
-    }
-    private boolean _isPropertiesOption(String arg){
-       return _isOption(arg)
-               &&findOptionByOptionTypeAndName(this.optionList, Option.OptionType.PropertyOption,arg)==null;
-    }
-    */
-    /*
-        fattening args like:
+        input fattening args like:
         [-o,foo1,foo2]
         [--option,foo1,foo2]
-        [-Dkey1=value1] : how to parse this?
-           1. check if contains '='
-           2. check if OptionList has properties Option.
-           3. check if match pattern like -<optionName>.*=.* or --<optionLongName>.*=.*
-           4. then parse the string token
+        [-Dkey1=value1]
      */
-    private void parseOption(String[] args,CmdLine cmd) throws Exception {
+    private void _parseOption(String[] args, CmdLine cmd) throws Exception {
         //when args[0] like "-Dkey1=value1", go to parse propertyOption
         if (args.length == 1 && args[0].matches(".*=.*")) {
-            parsePropertyOption(args[0], cmd);
+            _parsePropertyOption(args[0], cmd);
         }
         //Parse ArgumentOption
         else {
@@ -109,8 +102,14 @@ public final class Parser {
             }
         }
     }
-
-    private void parsePropertyOption(String arg, CmdLine cmd){
+    /*
+       [-Dkey1=value1] : parse property option
+           1. check if contains '='
+           2. check if OptionList has properties Option.
+           3. check if match pattern like -<optionName>.*=.* or --<optionLongName>.*=.*
+           4. then parse the string token
+    */
+    private void _parsePropertyOption(String arg, CmdLine cmd){
         for(Option o : filterOptionByType(this.optionList, Option.OptionType.PropertyOption)){
             String opt = null;
             if(arg.matches(o.name+".*=.*")){ //-Dkey1=value1
@@ -121,10 +120,12 @@ public final class Parser {
             //matched
             if (opt!=null){
                 String[] pair  = arg.split("=");
+                checkState(pair.length!=2,"The property option [%s] can't parse into key->value pair correctly",arg);
                 String key = pair[0].replaceFirst(opt,"");
                 String value = pair [1];
                 cmd.addOptionValue(opt,key);
                 cmd.addOptionValue(opt,value);
+                //TODO, do we need to do some logging ?
                 //checkArg(true,"go to parse property [%s] -> [%s],[%s] ",arg,key,value);
             }
         }
@@ -157,12 +158,7 @@ public final class Parser {
         }
         return newList;
     }
-    /*
-    static Option findOptionByOptionTypeAndName(List<Option> optionList,Option.OptionType optType, String optionName){
-        Option o = findOptionByName(optionList,optionName);
-        return (o!=null&&o.optionType==optType) ? o : null;
-    }
-    */
+
 }
 
 

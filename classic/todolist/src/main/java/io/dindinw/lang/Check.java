@@ -14,9 +14,18 @@ import java.util.Objects;
 public final class Check {
     private Check() {}
 
+    public static void checkState(boolean exp,String errMsgTemplate, Object... errMsgArgs) throws IllegalArgumentException{
+        _checkState(exp,errMsgTemplate,errMsgArgs);
+    }
+    private static void _checkState(boolean exp,String errMsgTemplate, Object... errMsgArgs) throws IllegalArgumentException{
+        errMsgTemplate = String.valueOf(errMsgTemplate); //in case null->"null"
+        if (exp){
+            throw new IllegalStateException(String.format(errMsgTemplate, errMsgArgs));
+        }
+    }
+
     public static void checkArg(boolean exp,String errMsgTemplate, Object... errMsgArgs) throws IllegalArgumentException{
         _checkArg(exp,errMsgTemplate,errMsgArgs);
-
     }
     private static void _checkArg(boolean exp,String errMsgTemplate, Object... errMsgArgs) throws IllegalArgumentException{
         errMsgTemplate = String.valueOf(errMsgTemplate); //in case null->"null"

@@ -1,6 +1,8 @@
 package io.dindinw.cmdline;
 
+import static io.dindinw.lang.Check.checkArg;
 import static io.dindinw.lang.Check.checkNotNull;
+import static io.dindinw.lang.Check.checkState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * All get methods return array since the results are immutable by nature
@@ -67,6 +70,20 @@ public class CmdLine {
         return new String[]{};
     }
 
+    public Properties getOptionProperties(String optionName) {
+        Properties properties = new Properties();
+        Option o = _findOptionByName(optionName);
+        if (o!=null&&o.optionType == Option.OptionType.PropertyOption){
+            List<String> values = optionValues.get(o.name);
+            // the option values array should always be even for property option
+            checkState(values.size()%2==1,"properties array contains odd values %s. a Parser error is not found.",values);
+            // add values to property pair by pair
+            for (int i = 0; i<= values.size()/2; i= i+2  ) {
+                properties.setProperty(values.get(i), values.get(i + 1));
+            }
+        }
+        return properties;
+    }
     /**
      * The easier version of {@link #getOptionValues(String)}
      * <p>
@@ -99,6 +116,8 @@ public class CmdLine {
              optionValues.get(o.name).add(optionValue);
         }
     }
+
+
     /*might not need
     public Option[] getOptions(){
         return optionList.toArray(new Option[optionList.size()]);

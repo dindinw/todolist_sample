@@ -6,6 +6,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.Properties;
 import java.util.prefs.Preferences;
 
 import io.dindinw.cmdline.CmdLine;
@@ -77,6 +78,10 @@ public class ParserTest {
         CmdLine cmd = parser.parse(new String[]{"mvn","clean","install","-DskipTests=true","-Dbuild=myProfile"});
         assertArrayEquals(new String[]{"mvn","clean","install"}, cmd.getArgs());
         assertArrayEquals(new String[]{"skipTests","true","build","myProfile"},cmd.getOptionValues("-D"));
+        Properties properties = cmd.getOptionProperties("-D");
+        assertEquals(2, properties.stringPropertyNames().size());
+        assertArrayEquals(new String[]{"skipTests","build"}, properties.stringPropertyNames().toArray(new String[2]));
+
 
     }
 }
