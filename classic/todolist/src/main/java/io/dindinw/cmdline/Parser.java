@@ -67,16 +67,25 @@ public final class Parser {
                         for (int i=index+1; i<=index+o.numberOfArgs; i++ ){
                             //OutOfIndex
                             checkState(i>=args.length,
-                                    "Parse error: Incorrect numberOfArgs: [%s]. Option : [%s], index=%s in %s.",
+                                    "Parse error: Incorrect numberOfArgs: %s. Option : [%s], index=%s in %s.",
                                     o.numberOfArgs,args[index],index,Arrays.asList(args));
                             //NotValue
                             checkState(_isOption(args[i]),
-                                    "Parse error: Incorrect value : [%s]. Option : [%s], index=%s in %s",
+                                    "Parse error: Incorrect value : %s. Option : [%s], index=%s in %s",
                                     args[i],args[index],index,Arrays.asList(args));
                             cmd.addOptionValue(o.name,args[i]);
                         }
-                        //need to change lastIndex
+                        //need to change lastIndex before we go to next one
+                        int oldIndex = index;
                         index = index+o.numberOfArgs;
+
+                        //before break, if not the last one, need to check if next is a option, otherwise, still error
+                        if (index<args.length-1) {
+                            checkState(!_isOption(args[index + 1]),
+                                    "Parse Error: Incorrect numberOfArgs: %s. Option : [%s], index=%s in %s.",
+                                    o.numberOfArgs, args[oldIndex], oldIndex, Arrays.asList(args));
+                        }
+
                         break;
                     case PropertyOption:
                         //need to parse Property
