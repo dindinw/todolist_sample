@@ -52,7 +52,7 @@ public class ParserTest {
                 .name("-i")
                 .longName("--input")
                 .withDesc("input file")
-                .setNumberOfArgs(1)
+                .setNumberOfArgs(2)
                 .build());
         parser.addOption(
                 Option.argOption().name("-o")
@@ -81,7 +81,14 @@ public class ParserTest {
         Properties properties = cmd.getOptionProperties("-D");
         assertEquals(2, properties.stringPropertyNames().size());
         assertArrayEquals(new String[]{"skipTests","build"}, properties.stringPropertyNames().toArray(new String[2]));
+    }
 
-
+    @Test
+    public void testArgumentOptionWithNumberOfArgs() throws Exception {
+        Parser parser = new Parser();
+        parser.addOption(Option.argOption().name("-i").setNumberOfArgs(2).build());
+        CmdLine cmd = parser.parse(new String[]{"-i","input1","input2"});
+        cmd.hasOption("-i");
+        assertArrayEquals(new String[]{"input1","input2"},cmd.getOptionValues("-i"));
     }
 }

@@ -2,10 +2,14 @@ package io.dindinw.cmdline;
 
 import static io.dindinw.lang.Check.checkArg;
 import static io.dindinw.lang.Check.checkState;
+import static io.dindinw.lang.Throw.newException;
+import static io.dindinw.lang.Throw.throwException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import io.dindinw.lang.Throw;
 
 /**
  * Created by alex on 3/10/15.
@@ -14,26 +18,85 @@ public final class Parser {
 
 
     List<Option> optionList = new ArrayList<>();
-
-    /**
-     * Parse the input arguments array.
-     * @param args
-     * @return
-     * @throws Exception
+    /*
+     Note: Argument String in the format like :
+       -o
+       --option
+       -Dkey=value
+       --CONFIGkey=value
      */
-    public CmdLine parse(String[] args) throws Exception{
-        CmdLine cmd = new CmdLine(optionList);
-        List<String[]> argsList = _argsToFlatteningList(args);
-        for( String[] f_args : argsList){
-            // like [--o,foo1,foo2]
-            // like [-option,foo1,foo2]
-            if (_isOption(f_args[0])){
-                _parseOption(f_args, cmd);
+    private Option _findOptionByArgument(String argument){
+        Option o = null;
+        // if it is a property argument
+        if (argument.matches(".*=.*")) {
+            for(Option pOption :
+                    filterOptionByType(this.optionList, Option.OptionType.PropertyOption)) {
+                if (argument.matches(pOption.name + ".*=.*")
+                        || argument.matches(pOption.longName + ".*=.*")){
+                    o = pOption;
+                    break;
+                }
             }
-            // like [foo], it just a argument
-            else{
-                checkArg(f_args.length != 1, "fattening array size should always equal 1 when work as normal argument");
-                cmd.addArg(f_args[0]);
+        }else{
+            o = findOptionByName(optionList,argument);
+        }
+        return o;
+    }
+    public CmdLine parse(String[] args) throws Exception{
+        CmdLine cmd = new CmdLine();
+        for (int index = 0 ; index < args.length; index++){
+            if (_isOption(args[index])){
+
+                // check if the Option has been defined
+                Option o = _findOptionByArgument(args[index]);
+                throwException(o == null, "Parse Error: Unknown Option : [%s]", args[index]);
+
+                // only property option allow to be seen multiple times in args[]
+                if (!Option.OptionType.PropertyOption.equals(o.optionType) && cmd.hasOption(args[index])){
+                    throwException("Parse Error: Duplicated Option : [%s] in %s",args[index],Arrays.asList(args));
+                }
+                cmd.addOption(o); //the command line has the option
+
+                // Parse option in case of its type
+                switch (o.optionType) {
+                    case SimpleOption:
+                        //no more handing need, break directly
+                        break;
+                    case ArgumentOption:
+                        //need to parse the value
+                        for (int i=index+1; i<=index+o.numberOfArgs; i++ ){
+                            //OutOfIndex
+                            checkState(i>=args.length,
+                                    "Parse error: Incorrect numberOfArgs: [%s]. Option : [%s], index=%s in %s.",
+                                    o.numberOfArgs,args[index],index,Arrays.asList(args));
+                            //NotValue
+                            checkState(_isOption(args[i]),
+                                    "Parse error: Incorrect value : [%s]. Option : [%s], index=%s in %s",
+                                    args[i],args[index],index,Arrays.asList(args));
+                            cmd.addOptionValue(o.name,args[i]);
+                        }
+                        //need to change lastIndex
+                        index = index+o.numberOfArgs;
+                        break;
+                    case PropertyOption:
+                        //need to parse Property
+                        String[] pair  = args[index].split("=");
+                        checkState(pair.length!=2,
+                                "Parse error : Incorrect property option argument [%s] ",args[index]);
+                        String optName = o.name;
+                        if(args[index].startsWith("--")){
+                            optName = o.longName;
+                        }
+                        String key = pair[0].replaceFirst(optName,"");
+                        String value = pair [1];
+                        cmd.addOptionValue(optName,key);
+                        cmd.addOptionValue(optName,value);
+                        break;
+                }
+            }else{
+                //double check it, the Option parse might change the index value.
+                checkState(_isOption(args[index]),"The [%s] in %s should not a Option",args[index],Arrays.asList(args));
+                cmd.addArg(args[index]);
             }
         }
         return cmd;
@@ -41,94 +104,6 @@ public final class Parser {
 
     private boolean _isOption(String arg){
        return arg.startsWith("-");
-    }
-
-    /*
-      The method convert the input args[] into the flatten list of args.
-      Ex:
-      [-i,inputfile,-o,outputfile,--debug] -> {[-i,inputfile],[-o,outputfile],[--debug]}
-     */
-    private List<String[]> _argsToFlatteningList(String[] args) {
-        List<String[]> flatteningList = new ArrayList<>();
-        for (int i = 0; i < args.length; i++) {
-            if (_isOption(args[i])){
-                boolean lastOption=true;
-                for (int endIndex = i; endIndex<args.length-1; endIndex++){
-                   if (_isOption(args[endIndex+1])){
-                       flatteningList.add(Arrays.copyOfRange(args,i,endIndex+1));
-                       lastOption=false;
-                       i=endIndex;
-                       break;
-                   }
-                }
-                if (lastOption){
-                    flatteningList.add(new String[]{args[i]});
-                }
-            }else{
-                flatteningList.add(new String[]{args[i]});
-            }
-        }
-        return flatteningList;
-    }
-
-    /*
-        input fattening args like:
-        [-o,foo1,foo2]
-        [--option,foo1,foo2]
-        [-Dkey1=value1]
-     */
-    private void _parseOption(String[] args, CmdLine cmd) throws Exception {
-        //when args[0] like "-Dkey1=value1", go to parse propertyOption
-        if (args.length == 1 && args[0].matches(".*=.*")) {
-            _parsePropertyOption(args[0], cmd);
-        }
-        //Parse ArgumentOption
-        else {
-            Option o = findOptionByName(this.optionList, args[0]);
-            if (o != null) {
-                // we got multiple option values (args.length > 1) and we find a defined option.
-                // but we don't define it as a option to take values, instead, it is a simpleOption
-                // which should take no value.
-                if (args.length > 1 && o.optionType == Option.OptionType.SimpleOption) {
-                    throw new Exception(String.format(
-                            "SimpleOption: %s can't take values %s ", o, Arrays.asList(args)));
-                }
-                for (int i = 1; i < args.length; i++) {
-                    cmd.addOptionValue(args[0], args[i]);
-                }
-            } else {
-                throw new Exception(String.format(
-                        "option '%s' not defined.", args[0]));
-            }
-        }
-    }
-    /*
-       [-Dkey1=value1] : parse property option
-           1. check if contains '='
-           2. check if OptionList has properties Option.
-           3. check if match pattern like -<optionName>.*=.* or --<optionLongName>.*=.*
-           4. then parse the string token
-    */
-    private void _parsePropertyOption(String arg, CmdLine cmd){
-        for(Option o : filterOptionByType(this.optionList, Option.OptionType.PropertyOption)){
-            String opt = null;
-            if(arg.matches(o.name+".*=.*")){ //-Dkey1=value1
-               opt = o.name;
-            }else if (arg.matches(o.longName+".*=.*")){ //--Configkey1=value2
-               opt = o.longName;
-            }
-            //matched
-            if (opt!=null){
-                String[] pair  = arg.split("=");
-                checkState(pair.length!=2,"The property option [%s] can't parse into key->value pair correctly",arg);
-                String key = pair[0].replaceFirst(opt,"");
-                String value = pair [1];
-                cmd.addOptionValue(opt,key);
-                cmd.addOptionValue(opt,value);
-                //TODO, do we need to do some logging ?
-                //checkArg(true,"go to parse property [%s] -> [%s],[%s] ",arg,key,value);
-            }
-        }
     }
 
     public void addOption(Option option){

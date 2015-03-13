@@ -28,16 +28,22 @@ public class CmdLine {
 
     /**
      * only at package level, should not created by end-user
-     * @param options
      */
-    CmdLine(List<Option> options){
-        this.optionList = options;
+    CmdLine(){
+        this.optionList = new ArrayList<>();
         this.optionValues = new HashMap<>();
-        for (Option o : options){
-            if (o.hasArg){
-                optionValues.put(o.name,new ArrayList<String>());
-            }
+    }
+    /*
+     use only by Parser
+     */
+    void addOption(Option o){
+        checkNotNull(o);
+        optionList.add(o);
+        //also need to initialize value list if null
+        if (o.hasArg&&null==optionValues.get(o.name)){
+            optionValues.put(o.name, new ArrayList<String>());
         }
+
     }
 
     /**
