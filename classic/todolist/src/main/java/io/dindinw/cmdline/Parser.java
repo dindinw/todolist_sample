@@ -5,8 +5,10 @@ import static io.dindinw.lang.Check.checkState;
 import static io.dindinw.lang.Throw.newException;
 import static io.dindinw.lang.Throw.throwException;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import io.dindinw.lang.Throw;
@@ -163,6 +165,14 @@ public final class Parser {
         return newList;
     }
 
+    public void printOptions(PrintStream out) {
+        Option[] options = optionList.toArray(new Option[optionList.size()]);
+        List<Option> newList = Arrays.asList(options);
+        Collections.sort(newList);
+        for(Option o : newList){
+            out.println(String.format("%s, %s \t %s",o.name,o.longName,o.description));
+        }
+    }
 }
 
 

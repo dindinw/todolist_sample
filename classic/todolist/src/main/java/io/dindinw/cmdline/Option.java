@@ -23,7 +23,7 @@ import io.dindinw.lang.Check;
  * Created by alex on 3/9/15.
  */
 
-public class Option {
+public class Option implements Comparable<Option> {
 
     /** after initialized they are not changeable */
     public final int numberOfArgs;
@@ -115,6 +115,13 @@ public class Option {
     public static SimpleOptionBuilder simpleOption(){
         return new SimpleOptionBuilder();
     }
+
+    @Override
+    public int compareTo(Option o) {
+        return this.name.compareTo(o.name) == 0 ? 0 : this.longName.compareTo(o.longName);
+    }
+
+
     public static abstract class OptionBuilder {
         protected String _name;
         protected String _longName;

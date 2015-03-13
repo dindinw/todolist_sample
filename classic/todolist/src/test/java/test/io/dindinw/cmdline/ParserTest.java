@@ -6,6 +6,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.prefs.Preferences;
@@ -113,6 +115,28 @@ public class ParserTest {
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage("required option [-i,");
         cmd = parser.parse(new String[]{"-o","output"});
+    }
+
+    @Test
+    public void testPrintHelp() throws Exception {
+        Parser parser = new Parser();
+        Option input = Option.argOption()
+                .name("-i").longName("--input").withDesc("input file")
+                .build();
+        Option output = Option.argOption()
+                .name("-o").longName("--output").withDesc("out file")
+                .required(false)
+                .build();
+        parser.addOption(input);
+        parser.addOption(output);
+        try {
+            CmdLine cmd = parser.parse(new String[]{"-o", "output"});
+        }catch(IllegalStateException e){
+            ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+            PrintStream testOut = new PrintStream(outContent);
+            parser.printOptions(testOut);
+            assertEquals("-i, --input \t input file\n-o, --output \t out file\n",outContent.toString());
+        }
 
     }
 }
