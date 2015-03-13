@@ -42,7 +42,15 @@ public final class Parser {
         }
         return o;
     }
-    public CmdLine parse(String[] args) throws Exception{
+
+    /**
+     * Parse command line String[] args
+     * @param args
+     * @return
+     * @throws Exception
+     * @throws IllegalStateException
+     */
+    public CmdLine parse(String[] args) throws Exception,IllegalStateException{
         CmdLine cmd = new CmdLine();
         for (int index = 0 ; index < args.length; index++){
             if (_isOption(args[index])){
@@ -108,6 +116,11 @@ public final class Parser {
                 cmd.addArg(args[index]);
             }
         }
+        //before return, need to check if required Option all available.
+        for (Option o : requiredOptions(this.optionList)){
+            checkState(!cmd.hasOption(o.name), "Parse error: required option [%s,%s] not found in %s",
+                    o.name,o.longName,Arrays.asList(args));
+        }
         return cmd;
     }
 
@@ -139,6 +152,13 @@ public final class Parser {
         List<Option> newList = new ArrayList<>(optionList.size());
         for (Option o : optionList){
             if (o.optionType == type) newList.add(o);
+        }
+        return newList;
+    }
+    static List<Option> requiredOptions(List<Option> optionList){
+        List<Option> newList = new ArrayList<>(optionList.size());
+        for (Option o : optionList){
+            if (o.isRequired) newList.add(o);
         }
         return newList;
     }

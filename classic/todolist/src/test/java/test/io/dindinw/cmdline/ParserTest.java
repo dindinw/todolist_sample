@@ -2,6 +2,7 @@ package test.io.dindinw.cmdline;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -90,5 +91,28 @@ public class ParserTest {
         CmdLine cmd = parser.parse(new String[]{"-i","input1","input2"});
         cmd.hasOption("-i");
         assertArrayEquals(new String[]{"input1","input2"},cmd.getOptionValues("-i"));
+    }
+
+    @Test
+    public void testOptionWithRequired() throws Exception {
+        Parser parser = new Parser();
+        Option input = Option.argOption().name("-i").build();
+        Option output = Option.argOption().name("-o").required(false).build();
+        parser.addOption(input);
+        parser.addOption(output);
+
+        assertTrue(input.isRequired);
+        assertFalse(output.isRequired);
+        CmdLine cmd = parser.parse(new String[]{"-i","input","-o","output"});
+        assertTrue(cmd.hasOption("-i"));
+        assertTrue(cmd.hasOption("-o"));
+
+        assertArrayEquals(new String[]{"input"}, cmd.getOptionValues("-i"));
+        assertArrayEquals(new String[]{"output"},cmd.getOptionValues("-o"));
+
+        thrown.expect(IllegalStateException.class);
+        thrown.expectMessage("required option [-i,");
+        cmd = parser.parse(new String[]{"-o","output"});
+
     }
 }

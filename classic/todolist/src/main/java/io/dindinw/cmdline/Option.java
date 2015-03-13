@@ -119,7 +119,7 @@ public class Option {
         protected String _name;
         protected String _longName;
         protected String _desc;
-        protected boolean _isRequired;
+        protected boolean _isRequired=true; //default always required
         /** default is 0 */
         protected final int DEFAULT_NUMBER_OF_ARGS=0;
         protected int _numberOfArgs=DEFAULT_NUMBER_OF_ARGS;
