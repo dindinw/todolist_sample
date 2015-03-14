@@ -59,7 +59,7 @@ public final class Parser {
 
                 // check if the Option has been defined
                 Option o = _findOptionByArgument(args[index]);
-                throwException(o == null, "Parse Error: Unknown Option : [%s]", args[index]);
+                throwException(o == null, "Parse Error: Unrecognized option : [%s]", args[index]);
 
                 // only property option allow to be seen multiple times in args[]
                 if (!Option.OptionType.PropertyOption.equals(o.optionType) && cmd.hasOption(args[index])){

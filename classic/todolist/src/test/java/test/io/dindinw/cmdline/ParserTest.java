@@ -98,13 +98,13 @@ public class ParserTest {
     @Test
     public void testOptionWithRequired() throws Exception {
         Parser parser = new Parser();
-        Option input = Option.argOption().name("-i").build();
-        Option output = Option.argOption().name("-o").required(false).build();
+        Option input = Option.argOption().name("-i").required(true).build();
+        Option output = Option.argOption().name("-o").build();
         parser.addOption(input);
         parser.addOption(output);
 
-        assertTrue(input.isRequired);
-        assertFalse(output.isRequired);
+        assertTrue(input.isRequired);   //required need to be set
+        assertFalse(output.isRequired); //default
         CmdLine cmd = parser.parse(new String[]{"-i","input","-o","output"});
         assertTrue(cmd.hasOption("-i"));
         assertTrue(cmd.hasOption("-o"));
