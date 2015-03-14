@@ -8,9 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.Properties;
-import java.util.prefs.Preferences;
 
 import io.dindinw.cmdline.CmdLine;
 import io.dindinw.cmdline.Option;
@@ -65,9 +63,9 @@ public class ParserTest {
 
         cmd = parser.parse(new String[]{"foo","foo2","-i","input","input2","-o","output","--Debug"});
         assertArrayEquals(new String[]{"foo","foo2"}, cmd.getArgs());
-        assertArrayEquals(new String[]{"input","input2"},cmd.getOptionValues("-i"));
-        assertEquals("input", cmd.getOptionValue("-i"));
-        assertArrayEquals(new String[]{"output"},cmd.getOptionValues("-o"));
+        assertArrayEquals(new String[]{"input","input2"},cmd.optionValuesOf("-i"));
+        assertEquals("input", cmd.optionValueOf("-i"));
+        assertArrayEquals(new String[]{"output"},cmd.optionValuesOf("-o"));
     }
 
     @Test
@@ -80,8 +78,8 @@ public class ParserTest {
                 .build());
         CmdLine cmd = parser.parse(new String[]{"mvn","clean","install","-DskipTests=true","-Dbuild=myProfile"});
         assertArrayEquals(new String[]{"mvn","clean","install"}, cmd.getArgs());
-        assertArrayEquals(new String[]{"skipTests","true","build","myProfile"},cmd.getOptionValues("-D"));
-        Properties properties = cmd.getOptionProperties("-D");
+        assertArrayEquals(new String[]{"skipTests","true","build","myProfile"},cmd.optionValuesOf("-D"));
+        Properties properties = cmd.optionPropertiesOf("-D");
         assertEquals(2, properties.stringPropertyNames().size());
         assertArrayEquals(new String[]{"skipTests","build"}, properties.stringPropertyNames().toArray(new String[2]));
     }
@@ -92,7 +90,7 @@ public class ParserTest {
         parser.addOption(Option.argOption().name("-i").setNumberOfArgs(2).build());
         CmdLine cmd = parser.parse(new String[]{"-i","input1","input2"});
         cmd.hasOption("-i");
-        assertArrayEquals(new String[]{"input1","input2"},cmd.getOptionValues("-i"));
+        assertArrayEquals(new String[]{"input1","input2"},cmd.optionValuesOf("-i"));
     }
 
     @Test
@@ -109,8 +107,8 @@ public class ParserTest {
         assertTrue(cmd.hasOption("-i"));
         assertTrue(cmd.hasOption("-o"));
 
-        assertArrayEquals(new String[]{"input"}, cmd.getOptionValues("-i"));
-        assertArrayEquals(new String[]{"output"},cmd.getOptionValues("-o"));
+        assertArrayEquals(new String[]{"input"}, cmd.optionValuesOf("-i"));
+        assertArrayEquals(new String[]{"output"},cmd.optionValuesOf("-o"));
 
         thrown.expect(IllegalStateException.class);
         thrown.expectMessage("required option [-i,");

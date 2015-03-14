@@ -1,12 +1,9 @@
 package io.dindinw.cmdline;
 
-import static io.dindinw.lang.Check.checkArg;
 import static io.dindinw.lang.Check.checkNotNull;
 import static io.dindinw.lang.Check.checkState;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +31,8 @@ public class CmdLine {
         this.optionValues = new HashMap<>();
     }
     /*
-     use only by Parser
+     use only by Parser in package level
+     add option, if input token is a valid option recognized by parser.
      */
     void addOption(Option o){
         checkNotNull(o);
@@ -44,6 +42,23 @@ public class CmdLine {
             optionValues.put(o.name, new ArrayList<String>());
         }
 
+    }
+    /*
+     use only by Parser in package level
+     add as argument, if input token is recognized as a argument by parser.
+    */
+    void addArg(String arg){
+        argList.add(arg);
+    }
+    /*
+     use only by Parser in package level
+     add as a value of a option, if a input token is recognized by parser.
+    */
+    void addOptionValue(String optionName,String optionValue){
+        Option o = _findOptionByName(optionName);
+        if (o!=null&&o.hasArg){
+             optionValues.get(o.name).add(optionValue);
+        }
     }
 
     /**
@@ -65,7 +80,7 @@ public class CmdLine {
      * @param optionName
      * @return
      */
-    public String[] getOptionValues(String optionName) {
+    public String[] optionValuesOf(String optionName) {
         Option o = _findOptionByName(optionName);
         if (o!=null){
             if (optionValues.containsKey(o.name)){
@@ -76,7 +91,12 @@ public class CmdLine {
         return new String[]{};
     }
 
-    public Properties getOptionProperties(String optionName) {
+    /**
+     * Get Java Properties by a Java Property Option like (-Dkey=value)
+     * @param optionName
+     * @return
+     */
+    public Properties optionPropertiesOf(String optionName) {
         Properties properties = new Properties();
         Option o = _findOptionByName(optionName);
         if (o!=null&&o.optionType == Option.OptionType.PropertyOption){
@@ -91,15 +111,15 @@ public class CmdLine {
         return properties;
     }
     /**
-     * The easier version of {@link #getOptionValues(String)}
+     * The easier version of {@link #optionValuesOf(String)}
      * <p>
      * The method will return the first element in the option's value list.
      * </p>
      * @param optionName
      * @return the first value of existed, otherwise null
      */
-    public String getOptionValue(String optionName) {
-        String[] values = getOptionValues(optionName);
+    public String optionValueOf(String optionName) {
+        String[] values = optionValuesOf(optionName);
         return (values.length == 0) ? null : values[0];
     }
 
@@ -112,16 +132,7 @@ public class CmdLine {
         return argList.toArray(new String[argList.size()]);
     }
 
-    void addArg(String arg){
-        argList.add(arg);
-    }
 
-    void addOptionValue(String optionName,String optionValue){
-        Option o = _findOptionByName(optionName);
-        if (o!=null&&o.hasArg){
-             optionValues.get(o.name).add(optionValue);
-        }
-    }
 
 
     /*might not need
