@@ -25,19 +25,20 @@ public final class JGrep {
     private static boolean show_line_number = false;
     private static boolean show_file_name = false;
     private static boolean show_color = false;
+    private static boolean case_insensitive=false;
 
     public static void main(String[] args) throws Exception{
         Parser parser = new Parser();
         parser.addOption(new Option("-n","--line-number","print the matched line number"));
         parser.addOption(new Option("-H","Always print filename headers with output lines."));
         parser.addOption(new Option(null,"--color","colorize the matching text"));
+        parser.addOption(new Option("-i","--ignore-case","Perform case insensitive matching,default is case sensitive."));
         CmdLine cmd = parser.parse(args);
 
         if (cmd.getArgs().length < 1) {
             System.err.println("Usage: JGrep pattern [file]|System.in "); System.exit(1);
             System.exit(1);
         }
-        Pattern p= Pattern.compile(cmd.getArgs()[0]+"+");
         if (cmd.hasOption("-n")){
            show_line_number = true;
         }
@@ -47,6 +48,16 @@ public final class JGrep {
         if (cmd.hasOption("--color")){
             show_color=true;
         }
+        if (cmd.hasOption("-i")){
+            case_insensitive=true;
+        }
+        Pattern p = null;
+        if (case_insensitive){
+            p = Pattern.compile(cmd.getArgs()[0],Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+        }else {
+            p = Pattern.compile(cmd.getArgs()[0]);
+        }
+
         if (cmd.getArgs().length == 1) {
             process(p,"SYSTEM.IN");
         }else{
