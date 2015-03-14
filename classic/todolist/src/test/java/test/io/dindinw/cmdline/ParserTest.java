@@ -122,10 +122,10 @@ public class ParserTest {
         Parser parser = new Parser();
         Option input = Option.argOption()
                 .name("-i").longName("--input").withDesc("input file")
+                .required(true)
                 .build();
         Option output = Option.argOption()
                 .name("-o").longName("--output").withDesc("out file")
-                .required(false)
                 .build();
         parser.addOption(input);
         parser.addOption(output);

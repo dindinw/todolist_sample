@@ -126,7 +126,7 @@ public class Option implements Comparable<Option> {
         protected String _name;
         protected String _longName;
         protected String _desc;
-        protected boolean _isRequired=true; //default always required
+        protected boolean _isRequired;
         /** default is 0 */
         protected final int DEFAULT_NUMBER_OF_ARGS=0;
         protected int _numberOfArgs=DEFAULT_NUMBER_OF_ARGS;
