@@ -68,7 +68,7 @@ public class Option implements Comparable<Option> {
      * @param description
      */
     public Option(String name, String longName, String description) {
-       this(name,longName,description,OptionType.SimpleOption,true,false,0);
+       this(name,longName,description,OptionType.SimpleOption,false,false,0);
     }
 
     private Option(String name,String longName,String description,OptionType type,boolean isRequired, boolean hasArg, int numberOfArgs){

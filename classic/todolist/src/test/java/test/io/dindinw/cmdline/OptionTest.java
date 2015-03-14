@@ -23,7 +23,7 @@ public class OptionTest {
         assertEquals("--Debug",debug.longName);
         assertEquals(0,debug.numberOfArgs);
         assertEquals(false,debug.hasArg);
-        assertEquals(true,debug.isRequired);
+        assertEquals(false,debug.isRequired); //by default, a option should be not required
         assertEquals(Option.OptionType.SimpleOption,debug.optionType);
     }
 
