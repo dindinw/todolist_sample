@@ -8,37 +8,44 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import io.dindinw.cmdline.CmdLine;
+import io.dindinw.cmdline.Color;
 import io.dindinw.cmdline.Option;
 import io.dindinw.cmdline.Parser;
 
 /**
  * A Java-version of unix tool 'grep'
+ * Support options: -Hn --color
  * TODO:
  *   1. code need to refactor
- *   2. I want to support the --color option
+ *   2. add more option
  * Created by alex on 3/13/15.
  */
 public final class JGrep {
 
     private static boolean show_line_number = false;
     private static boolean show_file_name = false;
+    private static boolean show_color = false;
 
     public static void main(String[] args) throws Exception{
         Parser parser = new Parser();
         parser.addOption(new Option("-n","--line-number","print the matched line number"));
         parser.addOption(new Option("-H","Always print filename headers with output lines."));
+        parser.addOption(new Option(null,"--color","colorize the matching text"));
         CmdLine cmd = parser.parse(args);
 
         if (cmd.getArgs().length < 1) {
             System.err.println("Usage: JGrep pattern [file]|System.in "); System.exit(1);
             System.exit(1);
         }
-        Pattern p= Pattern.compile(cmd.getArgs()[0]);
+        Pattern p= Pattern.compile(cmd.getArgs()[0]+"+");
         if (cmd.hasOption("-n")){
            show_line_number = true;
         }
         if (cmd.hasOption("-H")){
             show_file_name = true;
+        }
+        if (cmd.hasOption("--color")){
+            show_color=true;
         }
         if (cmd.getArgs().length == 1) {
             process(p,"SYSTEM.IN");
@@ -64,15 +71,32 @@ public final class JGrep {
         if (show_file_name){
             file=fileName+":";
         }
-        while ((line = br.readLine()) !=null){
+        while ((line = br.readLine()) != null) {
             lineNum++;
             m.reset(line);
-            if (m.find()){
-                if (show_line_number){
-                    line_number = ""+lineNum+":";
+            StringBuffer colorized = new StringBuffer();
+            boolean matched=false;
+            while (m.find()) {
+                matched = true;
+                if (show_line_number) {
+                    line_number = "" + lineNum+":";
                 }
-                System.out.printf("%s%s%s\n",file,line_number,line);
+                if (show_color) {
+                    m.appendReplacement(colorized, Color.ANSI_RED + m.group(0) + Color.ANSI_RESET);
+                }
+            }
+            m.appendTail(colorized);
+
+            if (matched) {
+                String out;
+                if (show_color){
+                    out = colorized.toString();
+                }else{
+                    out = line;
+                }
+                System.out.printf("%s%s%s\n",file, line_number,out);
             }
         }
+
     }
 }
