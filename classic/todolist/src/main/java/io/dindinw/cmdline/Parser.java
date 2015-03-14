@@ -56,10 +56,33 @@ public final class Parser {
         CmdLine cmd = new CmdLine();
         for (int index = 0 ; index < args.length; index++){
             if (_isOption(args[index])){
-
                 // check if the Option has been defined
                 Option o = _findOptionByArgument(args[index]);
-                throwException(o == null, "Parse Error: Unrecognized option : [%s]", args[index]);
+                if (o==null){
+                    // check if a clustered options argument
+                    boolean validClusteredOpt=true;
+                    for (int i = 1; i<args[index].length(); i++){
+                        String token = "-"+args[index].charAt(i);
+                        Option charOpt = _findOptionByArgument(String.valueOf(token));
+                        //for every single char option should exist, otherwise not valid
+                        if (charOpt == null ||
+                                //for every option should be simple option, otherwise not valid
+                                !charOpt.optionType.equals(Option.OptionType.SimpleOption)){
+                            validClusteredOpt=false;
+                            //any error, don't check next token anymore
+                            break;
+                        }
+                        //only simple option (boolean option) support clustering.
+                        cmd.addOption(charOpt);
+                    }
+                    //go here, means a valid clustered option argument has been done
+                    //so that we break to next argument in args[]
+                    if (validClusteredOpt) {
+                        continue;
+                    }
+
+                }
+                throwException(o==null, "Parse Error: Unrecognized option : [%s]", args[index]);
 
                 // only property option allow to be seen multiple times in args[]
                 if (!Option.OptionType.PropertyOption.equals(o.optionType) && cmd.hasOption(args[index])){

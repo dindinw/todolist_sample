@@ -135,6 +135,38 @@ public class ParserTest {
             parser.printOptions(testOut);
             assertEquals("-i, --input \t input file\n-o, --output \t out file\n",outContent.toString());
         }
+    }
+
+    /**
+     * For simple option(boolean option) should support clustering. ( multiple short-opt in a single argument)
+     * prerequisites:
+     * 1. input should only in short-opt names combination. long-opt names cannot be clustered
+     * 2. only simple option,
+     * @throws Exception
+     */
+    @Test
+    public void testClusteredOptions() throws Exception{
+
+        Parser parser = new Parser();
+        Option a = new Option("-a", "--text","Treat all files as ASCII text.");
+        Option n = new Option("-n", "--line-number","Show line number");
+        Option H = new Option("-H","Always print filename headers with output lines.");
+        Option color= new Option(null,"--color","colorize the matching text");
+        parser.addOption(a);
+        parser.addOption(n);
+        parser.addOption(H);
+        parser.addOption(color);
+
+        CmdLine cmd = parser.parse(new String[]{"-aHn", "--color", "foo"});
+
+        assertTrue(cmd.hasOption("-a"));
+        assertTrue(cmd.hasOption("-H"));
+        assertTrue(cmd.hasOption("-n"));
+        assertTrue(cmd.hasOption("--color"));
+        assertArrayEquals(new String[]{"foo"},cmd.getArgs());
+        //Unrecognized option -aHnW
+        thrown.expect(Exception.class);
+        cmd = parser.parse(new String[]{"-aHnW", "--color", "foo"});
 
     }
 }
