@@ -21,6 +21,10 @@ import io.dindinw.cmdline.Parser;
 
 /**
  * A Java-version of unix tool 'grep'
+ * TODO:
+ *   1. code need to refactor
+ *   2. only support the -n option
+ *   3. my option parser don't handle GNU getOpt() standard, so that I can't support the option like '-aHn'
  * Created by alex on 3/13/15.
  */
 public final class JGrep {
