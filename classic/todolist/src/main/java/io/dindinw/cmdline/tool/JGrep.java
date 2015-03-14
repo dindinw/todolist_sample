@@ -15,7 +15,7 @@ import io.dindinw.cmdline.Parser;
  * A Java-version of unix tool 'grep'
  * TODO:
  *   1. code need to refactor
- *   2. only support the -n option
+ *   2. I want to support the --color option
  * Created by alex on 3/13/15.
  */
 public final class JGrep {
