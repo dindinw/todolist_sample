@@ -24,14 +24,17 @@ import io.dindinw.cmdline.Parser;
  * TODO:
  *   1. code need to refactor
  *   2. only support the -n option
- *   3. my option parser don't handle GNU getOpt() standard, so that I can't support the option like '-aHn'
  * Created by alex on 3/13/15.
  */
 public final class JGrep {
-    public static boolean show_line_number = false;
+
+    private static boolean show_line_number = false;
+    private static boolean show_file_name = false;
+
     public static void main(String[] args) throws Exception{
         Parser parser = new Parser();
         parser.addOption(new Option("-n","--line-number","print the matched line number"));
+        parser.addOption(new Option("-H","Always print filename headers with output lines."));
         CmdLine cmd = parser.parse(args);
 
         if (cmd.getArgs().length < 1) {
@@ -40,39 +43,44 @@ public final class JGrep {
         }
         Pattern p= Pattern.compile(cmd.getArgs()[0]);
         if (cmd.hasOption("-n")){
-            //System.out.printf("show line number \n");
            show_line_number = true;
         }
+        if (cmd.hasOption("-H")){
+            show_file_name = true;
+        }
         if (cmd.getArgs().length == 1) {
-            process(p,System.in);
+            process(p,"SYSTEM.IN");
         }else{
             for (int i=1; i<cmd.getArgs().length; i++)
                 process(p, cmd.getArgs()[i]);
         }
-
     }
-    static void process(Pattern pattern, InputStream input) throws IOException{
-        BufferedReader br = new BufferedReader(new InputStreamReader(input));
+
+    static void process(Pattern pattern, String fileName) throws IOException {
+        BufferedReader br = null;
+        if ("SYSTEM.IN".equals(fileName)){
+            br = new BufferedReader(new InputStreamReader(System.in));
+        }else{
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
+        }
 
         Matcher m = pattern.matcher("");
         String line = null;
         int lineNum = 0;
+        String line_number = "";
+        String file ="";
+        if (show_file_name){
+            file=fileName+":";
+        }
         while ((line = br.readLine()) !=null){
             lineNum++;
             m.reset(line);
             if (m.find()){
-                String line_number = "";
                 if (show_line_number){
                     line_number = ""+lineNum+":";
                 }
-                System.out.printf("%s%s\n",line_number,line);
+                System.out.printf("%s%s%s\n",file,line_number,line);
             }
         }
-    }
-
-    static void process(Pattern pattern, String fileName) throws IOException {
-        // Get a FileChannel from the given file.
-        process(pattern, new FileInputStream(fileName)); // Map the file's content
-
     }
 }
