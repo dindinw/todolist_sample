@@ -64,8 +64,12 @@ import io.dindinw.util.SysUtil;
  * <p>
  *     Example :
  *     <pre>
+ *     $ JDate -F "G yyyy QQQQ MMM dd E a HH:mm:ss"
+ *     $ AD 2015 1st quarter Mar 15 Sun PM 15:44:13
+ *
  *     $ JDate -F "G yyyy QQQQ MMM dd E a HH:mm:ss             " -L zh_CN
  *     $ 公元 2015 第1季度 三月 15 星期日 下午 15:34:09
+ *
  *     $ JDate -F "G yyyy QQQQ MMM dd E a HH:mm:ss                       " -L ja_JP
  *     $ 西暦 2015 第1四半期 3 15 日 午後 15:43:02
  *     </pre>
