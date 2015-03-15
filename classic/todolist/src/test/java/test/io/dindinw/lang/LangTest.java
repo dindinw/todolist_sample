@@ -9,7 +9,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,8 +17,6 @@ import java.util.Vector;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import io.dindinw.concurrent.SynchronizTest;
-import io.dindinw.lang.Throw;
 import org.junit.Test;
 
 /**
@@ -62,7 +59,7 @@ public class LangTest {
         Vector<String> nameVector = new Vector<>();
         nameVector.addAll(names);
         for (Enumeration<String> e = nameVector.elements(); e.hasMoreElements();)
-            assertEquals("alex",e.nextElement().toLowerCase());
+            assertEquals("alex", e.nextElement().toLowerCase());
 
         // JAVA 2  java.util.Iterator
         // while loop by iterator
