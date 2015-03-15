@@ -66,6 +66,8 @@ import io.dindinw.util.SysUtil;
  *     <pre>
  *     $ JDate -F "G yyyy QQQQ MMM dd E a HH:mm:ss             " -L zh_CN
  *     $ 公元 2015 第1季度 三月 15 星期日 下午 15:34:09
+ *     $ JDate -F "G yyyy QQQQ MMM dd E a HH:mm:ss                       " -L ja_JP
+ *     $ 西暦 2015 第1四半期 3 15 日 午後 15:43:02
  *     </pre>
  *    <p>
  *       TODO: extra spaces are required when printing local string.
@@ -77,7 +79,7 @@ import io.dindinw.util.SysUtil;
  * Created by alex on 3/15/15.
  */
 public class JDate {
-    private static String DEFAULT_DATE_FORMATTING = "yyyy/LL/dd";
+    private static String DEFAULT_DATE_FORMATTING = "yyyy/LL/dd HH:mm:ss";
 
     public static void main(String[] args) throws Exception {
         Parser parser = new Parser();
