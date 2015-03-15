@@ -10,8 +10,11 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Vector;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -50,7 +53,34 @@ public class LangTest {
         ArrayList<String> names = new ArrayList<>();
         names.add("alex");
         names.add("ALEX");
-        // JAVA 5/6
+
+        // JAVA 1  C style for loop
+        for (int i = 0; i<names.size(); i++){
+            assertEquals("alex",names.get(i).toLowerCase());
+        }
+        // JAVA 1  Enumeration
+        Vector<String> nameVector = new Vector<>();
+        nameVector.addAll(names);
+        for (Enumeration<String> e = nameVector.elements(); e.hasMoreElements();)
+            assertEquals("alex",e.nextElement().toLowerCase());
+
+        // JAVA 2  java.util.Iterator
+        // while loop by iterator
+        Iterator<String> iterator = names.iterator();
+        while(iterator.hasNext()){
+            assertEquals("alex",iterator.next().toLowerCase());
+        }
+        // for loop by iterator
+        iterator = names.iterator();
+        for(int i= 0;iterator.hasNext();i++){
+            assertEquals("alex",iterator.next().toLowerCase());
+            if (!iterator.hasNext()){
+                assertEquals(1,i);
+            }
+        }
+
+        // JAVA 5  "foreach" loop
+
         for (String name: names){
             assertEquals("alex",name.toLowerCase());
         }
@@ -127,9 +157,9 @@ public class LangTest {
         String[] sortedName = new String[names.size()];
         Arrays.sort(
                 names.toArray(sortedName),
-                (x,y)->Character.compare(x.charAt(x.length()-1),y.charAt(y.length()-1))
+                (x, y) -> Character.compare(x.charAt(x.length() - 1), y.charAt(y.length() - 1))
         );
-        assertArrayEquals(new String[]{"ALEX","AleY","alex"},sortedName);
+        assertArrayEquals(new String[]{"ALEX", "AleY", "alex"}, sortedName);
 
         //'this' in a lambda expression.
         //There is no way to reference to the lambda expression from inside the lambda.
