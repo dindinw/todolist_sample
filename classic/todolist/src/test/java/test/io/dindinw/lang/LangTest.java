@@ -12,9 +12,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.Vector;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -310,5 +312,67 @@ public class LangTest {
         //after sored ignoring case
         assertArrayEquals(new String[]{"a01","A02","b01"},withCase.toArray());
 
+    }
+
+    /*
+        Testing for TreeSet/TreeMap, which is ordered (key is ordered for map) in nature
+     */
+    @Test
+    public void testTreeSet(){
+        TreeSet<String> orderedSet = new TreeSet();
+        orderedSet.add("A01");
+        orderedSet.add("A10");
+        orderedSet.add("A11");
+        assertEquals("A01", orderedSet.first());
+        assertEquals("A11",orderedSet.last());
+        //Now comparing with HashSet
+        HashSet<String> unorderedSet = new HashSet<>();
+        unorderedSet.add("A01");
+        unorderedSet.add("A10");
+        unorderedSet.add("A11");
+        ArrayList<String> list = new ArrayList<>(3);
+        unorderedSet.forEach(list::add);
+        assertEquals("A10",list.get(0));
+        assertEquals("A11",list.get(1));
+        assertEquals("A01",list.get(2));
+    }
+
+    /*
+        Find element from Collection
+     */
+    @Test
+    public void testFind(){
+        // -----------------------------------------------------------------------------
+        // Array
+        // -----------------------------------------------------------------------------
+        String[] names = new String[]{"Brian","David","Eva","Alex","Christ"};
+        assertEquals("Alex",names[3]); //before sorted [Brian,David,Alex,Christ]
+
+        // Gotcha ! the Array need to be sored before using binarySearch
+        int found = Arrays.binarySearch(names,"Alex");
+        assertEquals(-1,found);
+        //why not found
+        // the 'Alex' is set to the position bigger than middle value (Eva), so that
+        // only [0,1] aka Brian and David will be compared, so that Alex will not be found
+
+        Arrays.sort(names);
+        assertEquals("Alex",names[0]); //after sorted  [Alex,Brian,Christ,David,Eva]
+        // now find again
+        found = Arrays.binarySearch(names,"Alex");
+        // this time, binarySearch works
+        assertEquals(0,found);
+        assertEquals("Alex",names[found]);
+
+        int unfounded = Arrays.binarySearch(names,"alex");
+        assertEquals(-6,unfounded); //Why -6
+        assertEquals(-30,'C'-'a');  //first compare with mid-value Christ, <0, not found, go to higher one
+        assertEquals(-29,'D'-'a');  //then David,  <0, not this one, go to higher
+        assertEquals(-28,'E'-'a');  //then Eva, <0, still not found, i am last one now
+        //since the last one is still not found, return -(low+1) -> -(5+1) -> -6
+        //in the case low is the last one
+        //Q: Why return -(insertion point)-1  ?
+        //'insertion point' is :
+        //    the index of the first element greater than the key,
+        //    or the array's length if all elements in the array are less than the key.
     }
 }
