@@ -234,6 +234,9 @@ public class LangTest {
     */
     @Test
     public void testSort(){
+    // -----------------------------------------------------------------------------
+    // Collections.sort()
+    // -----------------------------------------------------------------------------
         List<String> abc = Arrays.asList("C","B","A");
         //before sort
         assertArrayEquals(new String[]{"C", "B", "A"}, abc.toArray());
@@ -311,6 +314,17 @@ public class LangTest {
         withCase.sort(String::compareToIgnoreCase); //I love Java 8
         //after sored ignoring case
         assertArrayEquals(new String[]{"a01","A02","b01"},withCase.toArray());
+    // -----------------------------------------------------------------------------
+    // Arrays.sort()
+    // -----------------------------------------------------------------------------
+        //Gotcha! String is not Integer
+        String[] tick = new String[]{"1","2","3","4","5","6","7","8","9","10","11","12","13"};
+        assertEquals("13",tick[tick.length-1]);    //last is 13
+        Arrays.sort(tick);
+        assertNotEquals("13",tick[tick.length-1]); //the last is not 13
+        assertEquals("9",tick[tick.length-1]);     //the last is 9
+
+
 
     }
 
@@ -319,7 +333,7 @@ public class LangTest {
      */
     @Test
     public void testTreeSet(){
-        TreeSet<String> orderedSet = new TreeSet();
+        TreeSet<String> orderedSet = new TreeSet<>();
         orderedSet.add("A01");
         orderedSet.add("A10");
         orderedSet.add("A11");
@@ -342,9 +356,9 @@ public class LangTest {
      */
     @Test
     public void testFind(){
-        // -----------------------------------------------------------------------------
-        // Array
-        // -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+    // Arrays.binarySearch()
+    // -----------------------------------------------------------------------------
         String[] names = new String[]{"Brian","David","Eva","Alex","Christ"};
         assertEquals("Alex",names[3]); //before sorted [Brian,David,Alex,Christ]
 
@@ -374,5 +388,41 @@ public class LangTest {
         //'insertion point' is :
         //    the index of the first element greater than the key,
         //    or the array's length if all elements in the array are less than the key.
+        // the reason is :
+        // I want to a insertion point, but. if not_found, I want the result to be negative.
+        //   but I can't return -insertion_point, because if insertion_point=0. then I got zero
+        //   so that I return -(insertion_point)-1,
+        // so that my insertion logic can write like:
+        //
+        // int index = Arrays.binarySearch(a,element);
+        // if (index >= 0){
+        //     insert to index
+        // }else{
+        //     insert to -index+1
+        // }
+
+        // not found range (-a.length-1,-1)
+        // so that -index+1 -> insert point
+        assertEquals(-1, Arrays.binarySearch(names,"A"));
+        assertEquals(-2, Arrays.binarySearch(names,"B"));
+        assertEquals(-3, Arrays.binarySearch(names,"C"));
+        assertEquals(-4, Arrays.binarySearch(names,"D"));
+        assertEquals(-5, Arrays.binarySearch(names,"E"));
+        assertEquals(-6, Arrays.binarySearch(names,"F"));
+        assertEquals(-6, Arrays.binarySearch(names,"G"));
+        assertEquals(-6, Arrays.binarySearch(names,"H"));
+        assertEquals(-6, Arrays.binarySearch(names,"I"));
+        assertEquals(-6, Arrays.binarySearch(names,"J"));
+        assertEquals(-6, Arrays.binarySearch(names,"a"));
+        assertEquals(-1, Arrays.binarySearch(names,"1"));
+        assertEquals(-1, Arrays.binarySearch(names,"2"));
+        assertEquals(-1, Arrays.binarySearch(names,"9"));
+        assertEquals(-1, Arrays.binarySearch(names, "0"));
+        // ASCII
+        assertEquals(48,(int)'0');
+        assertEquals(57,(int)'9');
+        assertEquals(64,(int)'@');
+        assertEquals(65,(int)'A');
+        assertEquals(97,(int)'a');
     }
 }
