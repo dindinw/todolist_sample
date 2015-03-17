@@ -230,8 +230,31 @@ public class LangTest {
     }
 
     /*
+        Testing for TreeSet/TreeMap, which is ordered (key is ordered for map) in nature
+     */
+    @Test
+    public void testTreeSet(){
+        TreeSet<String> orderedSet = new TreeSet<>();
+        orderedSet.add("A01");
+        orderedSet.add("A10");
+        orderedSet.add("A11");
+        assertEquals("A01", orderedSet.first());
+        assertEquals("A11",orderedSet.last());
+        //Now comparing with HashSet
+        HashSet<String> unorderedSet = new HashSet<>();
+        unorderedSet.add("A01");
+        unorderedSet.add("A10");
+        unorderedSet.add("A11");
+        ArrayList<String> list = new ArrayList<>(3);
+        unorderedSet.forEach(list::add);
+        assertEquals("A10",list.get(0));
+        assertEquals("A11",list.get(1));
+        assertEquals("A01",list.get(2));
+    }
+
+    /*
         For Testing the Collections.sort() and Arrays.sort()
-    */
+     */
     @Test
     public void testSort(){
     // -----------------------------------------------------------------------------
@@ -321,34 +344,36 @@ public class LangTest {
         String[] tick = new String[]{"1","2","3","4","5","6","7","8","9","10","11","12","13"};
         assertEquals("13",tick[tick.length-1]);    //last is 13
         Arrays.sort(tick);
-        assertNotEquals("13",tick[tick.length-1]); //the last is not 13
-        assertEquals("9",tick[tick.length-1]);     //the last is 9
+        assertNotEquals("13", tick[tick.length - 1]); //the last is not 13
+        assertEquals("9", tick[tick.length - 1]);     //the last is 9
+        // -----------------------------------------------------------------------------
+        // Summary of sort algorithms in Arrays
+        // -----------------------------------------------------------------------------
+        // Note:
+        //   1.) QuickSort is average O(nlog(n)), its worst-case is O(n^2)
+        //   2.) MergeSort is average O(nlog(n)), worst-case is O(nlog(n))
+        //
+        // @see <a href="http://en.wikipedia.org/wiki/Sorting_algorithm">Introduction of Sorting Algorithm</a>
+        // @see <a href="http://www.sorting-algorithms.com">Cool Sorting Algorithm Animations</a>
+        //
+        // # sort(xxx[]) for int,long,short,char,byte,float,double :
+        //    - DualPivotQuickSort (1.7)
+        // # sort(T[]):
+        //    - legacyMergeSort (old Java impl for merge sort)
+        //    - or TimSort (1.8, new MergeSort from Python)
+        // # sort(Object[]) : for old compatible
+        //    - legacyMergeSort
+        //    - or ComparableTimSort, a duplicate of TimSort for object[]
+        // # parallelSort(xxx[]) for int,long,short,char,byte,float,double : (1.8)
+        //    - DualPivotQuickSort
+        //    - or ArraysParallelSortHelpers.FJObject.Sorter (1.8): quicksort+mergesort
+        // # parallelSort(T[]) :
+        //    - TimSort
+        //    - or ArraysParallelSortHelpers.FJObject.Sorter
+        // -----------------------------------------------------------------------------
 
 
 
-    }
-
-    /*
-        Testing for TreeSet/TreeMap, which is ordered (key is ordered for map) in nature
-     */
-    @Test
-    public void testTreeSet(){
-        TreeSet<String> orderedSet = new TreeSet<>();
-        orderedSet.add("A01");
-        orderedSet.add("A10");
-        orderedSet.add("A11");
-        assertEquals("A01", orderedSet.first());
-        assertEquals("A11",orderedSet.last());
-        //Now comparing with HashSet
-        HashSet<String> unorderedSet = new HashSet<>();
-        unorderedSet.add("A01");
-        unorderedSet.add("A10");
-        unorderedSet.add("A11");
-        ArrayList<String> list = new ArrayList<>(3);
-        unorderedSet.forEach(list::add);
-        assertEquals("A10",list.get(0));
-        assertEquals("A11",list.get(1));
-        assertEquals("A01",list.get(2));
     }
 
     /*
@@ -422,7 +447,7 @@ public class LangTest {
         assertEquals(48,(int)'0');
         assertEquals(57,(int)'9');
         assertEquals(64,(int)'@');
-        assertEquals(65,(int)'A');
+        assertEquals(65, (int) 'A');
         assertEquals(97,(int)'a');
     }
 }
