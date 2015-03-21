@@ -346,6 +346,7 @@ public class LangTest {
         Arrays.sort(tick);
         assertNotEquals("13", tick[tick.length - 1]); //the last is not 13
         assertEquals("9", tick[tick.length - 1]);     //the last is 9
+
         // -----------------------------------------------------------------------------
         // Summary of sort algorithms in Arrays
         // -----------------------------------------------------------------------------
@@ -358,12 +359,12 @@ public class LangTest {
         //
         // # sort(xxx[]) for int,long,short,char,byte,float,double :
         //    - DualPivotQuickSort (1.7)
-        // # sort(T[]):
+        // # sort(T[],Comparator):
         //    - legacyMergeSort (old Java impl for merge sort)
         //    - or TimSort (1.8, new MergeSort from Python)
         // # sort(Object[]) : for old compatible
-        //    - legacyMergeSort
-        //    - or ComparableTimSort, a duplicate of TimSort for object[]
+        //    - ComparableTimSort, a duplicate of TimSort for object[]
+        //    - or legacyMergeSort if user-quest by a system property
         // # parallelSort(xxx[]) for int,long,short,char,byte,float,double : (1.8)
         //    - DualPivotQuickSort
         //    - or ArraysParallelSortHelpers.FJObject.Sorter (1.8): quicksort+mergesort
@@ -372,8 +373,91 @@ public class LangTest {
         //    - or ArraysParallelSortHelpers.FJObject.Sorter
         // -----------------------------------------------------------------------------
 
+        Integer[] data = new Integer[]{10,3000,5,7,2,4,11,50,3,3,10,323,1111,1,7};
+        //Gotcha!, asList create the reference to array. need to copy first
+        List<Integer> list = Arrays.asList(Arrays.copyOf(data,data.length));
+        Collections.sort(list);
+        Collections.reverse(list);
+        Integer[] data_r = list.toArray(new Integer[data.length]);
 
+        Integer[] data_s = Arrays.copyOf(data,data.length);
+        Arrays.sort(data_s);
+        System.out.println("---------------------------------------------------------");
+        System.out.println(Arrays.asList(data));
+        System.out.println(Arrays.asList(data_r));
+        System.out.println(Arrays.asList(data_s));
+        System.out.println("---------------------------------------------------------");
 
+        // -----------------------------------------------------------------------------
+        //  Bubble Sort
+        // -----------------------------------------------------------------------------
+        // 1. for element in array, a[i] compare with a[j] , for j in (i+1,a.length-1)
+        // 2. if a[i]>a[j], swap(i,j),
+        // [1,5,7,2,4,11]
+        // -> [1,5,2,7,4,11] -> [1,5,2,4,7,11] -> [1,2,4,5,7,11]
+
+        //worse than bubble
+        String algorithm ="worst";
+        Integer[] numbers = Arrays.copyOf(data,data.length);
+        //numbers = Arrays.copyOf(data_r,data_r.length);
+        //numbers = Arrays.copyOf(data_s,data_s.length);
+        System.out.println(Arrays.asList(numbers));
+        int count = 0;
+        for (int x = 0; x < numbers.length-3; x++) {
+            for (int i = 0; i < numbers.length - 1; i++) {
+                int j = i + 1;
+                if (numbers[i] > numbers[j]) {
+                    swap(i,j,numbers);
+//                    count++;
+                    System.out.println(Arrays.asList(numbers));
+                }
+                count++;
+            }
+        }
+        System.out.printf("algorithm: %s \n   size^2: %s (%s^2)\n    count: %s\n",
+                algorithm,numbers.length*numbers.length,numbers.length,count);
+        System.out.println(Arrays.asList(numbers));
+        System.out.println("---------------------------------------------------------");
+
+        //bubble
+        //why half (210/2=105) of loop is unnecessary?
+        // [A,B,C,D]
+        // [B,A,C,D]
+        // [B,C,A,D]
+        // [B,C,D,A]
+        algorithm = "bubble";
+        numbers = Arrays.copyOf(data,data.length);
+        //numbers = Arrays.copyOf(data_r,data_r.length);
+        //numbers = Arrays.copyOf(data_s,data_s.length);
+        System.out.println(Arrays.asList(numbers));
+
+        count = 0;
+        for (int m = numbers.length; m >= 0; m--){
+            for (int i = 0; i< m-1; i++){
+                int k = i + 1;
+                if (numbers[i]>numbers[k]){
+                    swap(i,k,numbers);
+                    System.out.println(Arrays.asList(numbers));
+ //                   count++;
+                }
+                count++;
+            }
+        }
+        System.out.printf("algorithm: %s \n   size^2: %s (%s^2)\n    count: %s\n",
+                algorithm,numbers.length*numbers.length,numbers.length,count);
+        System.out.println(Arrays.asList(numbers));
+
+        algorithm = "better bubble";
+
+        // -----------------------------------------------------------------------------
+        //  Bubble Sort
+        // -----------------------------------------------------------------------------
+
+    }
+    private void swap(Integer i, Integer j, Integer[] a){
+        Integer temp = a[i];
+        a[i]= a[j];
+        a[j]= temp;
     }
 
     /*
