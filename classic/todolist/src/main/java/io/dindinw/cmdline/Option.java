@@ -118,7 +118,8 @@ public class Option implements Comparable<Option> {
 
     @Override
     public int compareTo(Option o) {
-        return this.name.compareTo(o.name) == 0 ? 0 : this.longName.compareTo(o.longName);
+        int result = this.name.compareTo(o.name);
+        return result == 0 ? this.longName.compareTo(o.longName):result;
     }
 
 

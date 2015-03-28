@@ -50,18 +50,22 @@ public class CollectUtil {
 
     /**
      * <p>
-     * get a stored list from a array of elements.
-     * The elements should be comparable, and the return list is immutable.
-     * java.lang.UnsupportedOperationException will thrown if try to modify the return list.
+     * return the a stored list wrapper a array of elements.
+     * The elements should be comparable, and the return list is just a wrapper of the array.
+     * so that the size of list is fixed, you can't add/remove element from the list.
+     * WARNING: if you sort the list, the array referenced insider will also sorted.
+     * java.lang.UnsupportedOperationException will thrown if try to add/remove element the return list.
      * </p>
      *
      * @param comparableElements
      * @throws ClassCastException if the array contains elements that are not
      *         <i>mutually comparable</i> (for example, strings and integers)
-     * @return immutable List from Arrays.asList()
+     * @return a wrapper List from Arrays.asList()
+     * @deprecated the method is nothing good that use Arrays.sort directly
      */
     @SafeVarargs
-    public static <T extends Comparable<?>> List<T> asImmutableSortedList(T... comparableElements) {
+    @Deprecated
+    public static <T extends Comparable<?>> List<T> asSortedList(T... comparableElements) {
         checkNotNull(comparableElements, "comparableElements can't be null.");
         checkNotContainNullElement(comparableElements);
         Arrays.sort(comparableElements);
@@ -73,9 +77,11 @@ public class CollectUtil {
      * @param inputSet
      * @throws ClassCastException if the set contains elements that are not
      *         <i>mutually comparable</i> (for example, strings and integers)
-     * @return immutable List from Arrays.asList()
+     * @return wrapper List from Arrays.asList()
+     * @deprecated this method is nothing good that use Arrays.sort directly
      */
-    public static <T> List<T> asImmutableSortedList(Set<T> inputSet) {
+    @Deprecated
+    public static <T> List<T> asSortedList(Set<T> inputSet) {
         checkNotNull(inputSet, "inputSet can't be null.");
         checkNotContainNullElement(inputSet);
         T[] myArray = (T[]) inputSet.toArray();

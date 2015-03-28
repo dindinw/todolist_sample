@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +22,8 @@ import java.util.Vector;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import io.dindinw.cmdline.Option;
+import io.dindinw.concurrent.ObjectWaitTest;
 import org.junit.Test;
 
 /**
@@ -46,7 +49,29 @@ public class LangTest {
         assertTrue("map 2 has been changed back", myMap.equals(myMap2));
     }
 
+    // Test empty array
+    @Test
+    public void testNullArray(){
+        Object[] nullInArray = new Object[] { null };
+        Object[] emptyArray = new Option[] {};
+        assertEquals(1, nullInArray.length);
+        assertEquals(null, nullInArray[0]);
+        assertEquals(0,emptyArray.length);
+        Object o = nullInArray[0];
+        try {
+            o = emptyArray[0];
+            fail();
+        }catch (ArrayIndexOutOfBoundsException e){};
 
+        try {
+            String.valueOf(null); //NPE throws
+            fail();
+        }catch(NullPointerException npe){  }
+        //see http://stackoverflow.com/questions/3131865/why-does-string-valueofnull-throw-a-nullpointerexception
+        //Effective Java 2nd Edition, Item 41: Use overloading judiciously
+        String.valueOf((Object)null); // ok now
+
+    }
 
 
     /*

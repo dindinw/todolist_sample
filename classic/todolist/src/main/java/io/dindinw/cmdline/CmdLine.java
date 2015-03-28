@@ -132,13 +132,8 @@ public class CmdLine {
         return argList.toArray(new String[argList.size()]);
     }
 
-
-
-
-    /*might not need
     public Option[] getOptions(){
         return optionList.toArray(new Option[optionList.size()]);
     }
-    */
 
 }

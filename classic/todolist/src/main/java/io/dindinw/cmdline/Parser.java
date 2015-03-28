@@ -190,7 +190,8 @@ public final class Parser {
 
     public void printOptions(PrintStream out) {
         Option[] options = optionList.toArray(new Option[optionList.size()]);
-        List<Option> newList = Arrays.asList(options);
+        List<Option> newList = new ArrayList<>();
+        newList.addAll(Arrays.asList(options));
         Collections.sort(newList);
         for(Option o : newList){
             out.println(String.format("%s, %s \t %s",o.name,o.longName,o.description));
