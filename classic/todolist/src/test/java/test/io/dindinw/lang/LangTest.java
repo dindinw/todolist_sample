@@ -63,12 +63,24 @@ public class LangTest {
             fail();
         }catch (ArrayIndexOutOfBoundsException e){};
 
+        //WHY NPE for String.valueOf(null) ?
         try {
             String.valueOf(null); //NPE throws
             fail();
         }catch(NullPointerException npe){  }
-        //see http://stackoverflow.com/questions/3131865/why-does-string-valueofnull-throw-a-nullpointerexception
-        //Effective Java 2nd Edition, Item 41: Use overloading judiciously
+
+        // Effective Java 2nd Edition, Item 41: Use overloading judiciously
+
+        // If more than one member method is both accessible and applicable to a method invocation,
+        // it is necessary to choose one to provide the descriptor for the run-time method dispatch.
+        // The Java programming language uses the rule that the most specific method is chosen.
+
+        // A char[] is-an Object, but not all Object is-a char[]. Therefore, char[] is more specific
+        // than Object, and as specified by the Java language, the String.valueOf(char[]) overload
+        // is chosen in this case.
+
+        // From http://stackoverflow.com/questions/3131865/why-does-string-valueofnull-throw-a-nullpointerexception
+
         String.valueOf((Object)null); // ok now
 
     }
