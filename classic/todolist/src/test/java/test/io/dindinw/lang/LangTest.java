@@ -297,6 +297,9 @@ public class LangTest {
     // -----------------------------------------------------------------------------
     // Collections.sort()
     // -----------------------------------------------------------------------------
+        List<String> empty = Collections.emptyList();
+        Collections.sort(empty); //I am ok for empty
+
         List<String> abc = Arrays.asList("C","B","A");
         //before sort
         assertArrayEquals(new String[]{"C", "B", "A"}, abc.toArray());
