@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -299,6 +300,26 @@ public class LangTest {
     // -----------------------------------------------------------------------------
         List<String> empty = Collections.emptyList();
         Collections.sort(empty); //I am ok for empty
+
+        //sort for time mills, but i need
+        List<Long> times = new ArrayList<>();
+        times.add(0L);
+        times.add(2L);
+        times.add(1L);
+        Collections.sort(times, new Comparator<Long>() {
+            @Override
+            public int compare(Long o1, Long o2) {
+                return o2.compareTo(o1);
+            }
+        });
+        assertEquals(2L, times.get(0).longValue());
+
+        Collections.sort(times);
+        assertEquals(0L, times.get(0).longValue());
+
+        Collections.sort(times, Comparator.<Long>reverseOrder()); //Java8 only
+        assertEquals(2L, times.get(0).longValue());
+
 
         List<String> abc = Arrays.asList("C","B","A");
         //before sort
