@@ -1,8 +1,12 @@
 package test.io.dindinw.lang;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.IntFunction;
 
+import io.dindinw.lang.Convert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +102,7 @@ public class HashCodeTest {
 
         //hashcode m1@3c699a5 p1@3c699a5 p2@3c699a5
         printHash("hashcode m1@{} p1@{} p2@{} ", m1.hashCode(), p1.hashCode(), p2.hashCode());
-        printHash("           @{}  @{}   @{} ", System.identityHashCode(m1),System.identityHashCode(p1),System.identityHashCode(p2));
+        printHash("           @{}  @{}   @{} ", System.identityHashCode(m1), System.identityHashCode(p1), System.identityHashCode(p2));
 
         // always fixed
         assertEquals("3c699a5", Integer.toHexString(m1.hashCode()));
@@ -160,19 +164,15 @@ public class HashCodeTest {
         assertNotNull(set.get(evilOne));
         assertTrue(setHolder == set.get(evilOne));
 
-
-
-        //So I can build a evil Object like above to fool the HashMap
-
+        //So that I can build a evil Object like above to fool the HashMap
+        LOG.info("evil one");
     }
 
-    static void printHash(String msgTemp,int... hashCode){
-        String[] hashArr = new String[hashCode.length];
-        for (int i=0; i<hashCode.length; i++){
-           hashArr[i] = Integer.toHexString(hashCode[i]);
-        }
-        LOG.info(msgTemp,hashArr);
+    static void printHash(String msgTemp,Integer... hashCode){
+        LOG.info(msgTemp, Convert.convertArray(hashCode, Integer::toHexString, String[]::new));
     }
+
+
     class Life{
         private String name;
         private Integer age;
