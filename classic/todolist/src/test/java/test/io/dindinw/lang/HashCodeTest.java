@@ -149,17 +149,22 @@ public class HashCodeTest {
         //  2.) k1.equals(k2)
         // So that k2 can fool HashMap
 
+        // In the evilOne case,
+        // 1.) hashcode() method is override by person.hashcode(). so that Alex,35 will ways get "3c699a5"
+        // 2.) equals() method is override always return true. so that evilOne equals to anything
+        // HashMap will be fool by evil. When HashMap see evilOne, he will think he see the p2
         Object evilOne = new Person("Alex",35){
             @Override
             public boolean equals(Object o) {
                 return true; //how evil I am !
             }
         };
+
         assertTrue(evilOne.hashCode()==p2.hashCode());
         assertTrue(evilOne.equals(p2));
 
         assertEquals(evilOne, p2);
-        assertFalse(evilOne == p2); //evilOne is not same with p2
+        assertFalse(evilOne == p2); //evilOne is not same one with p2
 
         assertNotNull(set.get(evilOne));
         assertTrue(setHolder == set.get(evilOne));
@@ -169,7 +174,7 @@ public class HashCodeTest {
     }
 
     static void printHash(String msgTemp,Integer... hashCode){
-        LOG.info(msgTemp, Convert.convertArray(hashCode, Integer::toHexString, String[]::new));
+        LOG.info(msgTemp, (Object[])Convert.convertArray(hashCode, Integer::toHexString, String[]::new));
     }
 
 
