@@ -1,5 +1,9 @@
 package io.dindinw.concurrent;
 
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.junit.Test;
+
 /**
  * The class is created for the Testing of ConcurrentHashMap impl
  *
@@ -64,4 +68,11 @@ package io.dindinw.concurrent;
  *
  */
 public class CHMTest {
+
+    @Test
+    public void testConstructors(){
+        //default constructor
+        ConcurrentHashMap chm = new ConcurrentHashMap();
+
+    }
 }
