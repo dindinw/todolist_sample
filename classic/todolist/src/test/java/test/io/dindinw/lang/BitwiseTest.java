@@ -6,8 +6,8 @@ import java.util.Arrays;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -125,6 +125,9 @@ public class BitwiseTest {
         assertEquals(0b0110, ENABLE_BIT_2 | ENABLE_BIT_3);
         assertEquals(0b0111, ENABLE_BIT_2 | ENABLE_BIT_3 | ENABLE_BIT_4);
 
+        //-----------------------------------
+        // How to enable a bit
+        //-----------------------------------
         byte config = 0b0000; //nothing enabled
         config |= ENABLE_BIT_1;  // 1st is enabled
         assertEquals(0b1000, config);
@@ -132,7 +135,10 @@ public class BitwiseTest {
         config |= ENABLE_BIT_3 | ENABLE_BIT_4;
         assertEquals(0b1011, config);
 
-        // how to disable (clear) : bitwise AND (&) with the bitwise NOT (~) of the bit
+        // ---------------------------------
+        // how to disable (clear) :
+        // ---------------------------------
+        // bitwise AND (&) with the bitwise NOT (~) of the bit
         // Bitwise And (&) will compare each bit of op1 and op2, if both of bit is 1, then result 1. otherwise result 0
         // Bitwise Not (~) will toggle the each bit of a operand.
         config &= ~ENABLE_BIT_1; //clear 1
@@ -140,9 +146,26 @@ public class BitwiseTest {
         config &= ~(ENABLE_BIT_2 | ENABLE_BIT_3); // clear 2 and 3
         assertEquals(0b0001, config); // only 4 remains
 
-        // Ok, How to check a bit if enabled
-        assertEquals(1, config & ENABLE_BIT_4);
-        assertEquals(0, config & ENABLE_BIT_2);
+        // ---------------------------------
+        // Check a bit if enabled
+        // ---------------------------------
+        // way-1: first, shift the bit to the right-most,
+        //       then bitwise AND with 1, will result the bit
+        assertEquals(1, config >> 0 & 1);
+        assertEquals(0, config >> 2 & 1);
+        config |= ENABLE_BIT_2;
+        assertEquals("00000101",padByte(config)); // original is 2 and 4 enabled
+        assertEquals("00000100", padByte(config & ENABLE_BIT_2)); // clear all others bits except 2
+        assertEquals("00000001", padByte(config >> 2)); // if we right shift 2 steps, the bit-2 will go to the right-most
+        assertEquals(1, config >> 2 & 1); //we bitwise And with 1, we get 1, we now know the bit-2 is 1
+
+        // way-2: bitwise And with the flag, so that we will clear all other bits expects the bit which the flog point to
+        //        then we compare the result with the flag. if same, the bit is 1, otherwise the bit is 0
+        assertEquals(0b0101, config);
+        assertEquals(config, ENABLE_BIT_2 | ENABLE_BIT_4);
+        assertTrue((config & ENABLE_BIT_2) == ENABLE_BIT_2);
+        assertTrue((config & ENABLE_BIT_4) == ENABLE_BIT_4);
+        assertFalse((config & ENABLE_BIT_3) == ENABLE_BIT_3);
 
     }
 
@@ -293,10 +316,10 @@ public class BitwiseTest {
         System.out.println(padLong(1L << 31)); //ok, it's 2147483648L now
         assertNotEquals(1 << 31, 1L << 31);
 
-        for (int v = 0; v < 0x100 ; v++) {
+        for (int v = 0; v < 0x100; v++) {
             // v<<31 is overflow, it 0 or -2147483648 , which depends on the right-most bit, if 1, then -2147483648, if 0, then 0
-            if ((v&1)==1) assertEquals(Integer.MIN_VALUE,v<<31);
-            if ((v&1)==0) assertEquals(0,v<<31);
+            if ((v & 1) == 1) assertEquals(Integer.MIN_VALUE, v << 31);
+            if ((v & 1) == 0) assertEquals(0, v << 31);
             //System.out.printf("%d(%s) << 31 -> %d(%s), %d(%s) \n", v, padInteger(v), v << 31, padInteger(v << 31), (long) v << 31, padLong((long) v << 31));
         }
 
