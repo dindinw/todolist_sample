@@ -8,10 +8,15 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 /**
  * Usage of bit Operands such as : | & ~ >> >>> <<
+ *
+ * The Bible for those algorithm is Henry S. Warren's "Hacker’s Delight"
+ * http://www.hackersdelight.org
+ *
  */
 public class BitwiseTest {
     @Test
@@ -85,7 +90,7 @@ public class BitwiseTest {
 
 
     private String padByte(int b) {
-        if (b > 0xFF) throw new IllegalArgumentException("b large than 255");
+        if (b > 0xFF) throw new IllegalArgumentException(b+" is large than 255");
         return Integer.toBinaryString((b & 0xFF) + 0x100).substring(1);
     }
 
@@ -104,6 +109,18 @@ public class BitwiseTest {
 
     private String padLong(long b) {
         return String.format("%64s", Long.toBinaryString(b)).replace(' ', '0');
+    }
+
+    @Test
+    public void testASCIIChar(){
+        char A = 'A';
+        //System.out.printf("%d %s %s %s \n",(byte)a,a,Integer.toBinaryString(a),Integer.toHexString(a));
+        assertEquals(0x41,65);
+        assertEquals(65,(byte)A);
+
+        char a = 'a';
+        assertEquals(0x61,97);
+        assertEquals(97,(byte)a);
     }
 
 
@@ -358,8 +375,15 @@ public class BitwiseTest {
         return i | (i + 1);
     }
 
-    private int roundUpNextPower2(int i) {
-        int n = i - 1;
+    /**
+     * return the next ceiling of closet power-of-2,
+     * see HD sec-3.2
+     * http://www.hackersdelight.org/hdcodetxt/clp2.c.txt
+     * @param n
+     * @return
+     */
+    private int roundUpNextPower2(int n) {
+        n = n - 1;
         n |= n >>> 1;
         n |= n >>> 2;
         n |= n >>> 4;
@@ -367,5 +391,77 @@ public class BitwiseTest {
         n |= n >>> 16;
         return n + 1;
     }
+
+    private int roundDownNextPower2(int n){
+        n |= n >>> 1;
+        n |= n >>> 2;
+        n |= n >>> 4;
+        n |= n >>> 8;
+        n |= n >>> 16;
+        return n - (n>>>1);
+    }
+
+
+
+    @Test
+    public void testRoundUp(){
+        for (int b=0; b<0x100; b++ ){
+            final int result =  roundUpNextPower2(b); //result will overflow the byte range since 129 (results 256)
+            System.out.printf("%d(%s) -> %d(%s)\n",b,padByte(b),result,padInteger(result));
+        }
+    }
+
+    @Test
+    public void testRoundDown(){
+        for (int b=0;b<0x100; b++) {
+            final int result = roundDownNextPower2(b); //result will never overflow a byte, the largest value is 128
+            System.out.printf("%d(%s) -> %d(%s)\n",b,padByte(b),result,padByte(result));
+        }
+    }
+
+
+    /**
+     * It's a copy for CHM initialization logic
+     * Why CHM using logic in addOnInitial() to shift the initialCapacity value before round up to a power-of-2 value ?
+     * In general, What CHM do is just try to double the size of input initialCapacity. The size need to be round so
+     * the round algorithm is fit in. The additional adjustment of the initialCapacity will shift the range, so that the
+     * round is more comfortable for memory usage.
+     * Ex. :
+     * # Without adjustment:
+     * ------------------------- --------
+     * The initial capacity      result
+     * ------------------------- --------
+     *   5 ~ 8                     8
+     *   9 ~ 16                   16
+     *   17 ~ 32                  32
+     *   33 ~ 64                  64
+     *
+     * # After add adjustment :
+     * ------------------------- --------
+     * The initial capacity      result
+     * ------------------------- --------
+     *   3 ~  5                    8
+     *   6 ~ 10                   16
+     *   11 ~ 21                  32
+     *   22 ~ 42                  64
+     *
+     *  so that 9 will not result 16, and it's too memory consume
+     *  in the other hand, the 6~8 will result 16 instead of 8. because 8 is not enough
+     */
+    @Test
+    public void testAdjustSize(){
+        for (int b=0; b<0x100; b++){
+            final int result = addOnInitial(b);
+            final int size = roundUpNextPower2(result);
+            System.out.printf("%d(%s) -> %d(%s) -> %d(%s)\n", b,padByte(b),result,padInteger(result),
+                    size,padInteger(size));
+        }
+    }
+    private int addOnInitial(int i){
+        return i + (i >>> 1) + 1 ;
+    }
+
+
+
 
 }
