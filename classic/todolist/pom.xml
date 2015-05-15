@@ -10,21 +10,55 @@
             maven build platform independent encoding to remove [WARNINGS]
         -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- ============= -->
+        <!-- = Core JAVA = -->
+        <!-- ============= -->
         <!--
-            http://central.maven.org/maven2/org/eclipse/jetty/jetty-maven-plugin/
-        -->
-        <jetty-version>9.2.9.v20150224</jetty-version>
-        <!--
-            http://central.maven.org/maven2/org/slf4j/
-            v1.7.9 16-Dec-2014
+            SLF4J
+            URL : http://central.maven.org/maven2/org/slf4j/slf4j-api
+            VERSION : v1.7.9
+            DATE : 16-Dec-2014
         -->
         <slf4j-version>1.7.9</slf4j-version>
         
-        <!-- 
-            http://central.maven.org/maven2/junit/junit/
-            4.12 04-Dec-2014
+        <!--
+            JUnit
+            URL : http://central.maven.org/maven2/junit/junit/
+            Latest Version : 4.12
+            Date  : 04-Dec-2014
          -->
         <junit-version>4.12</junit-version>
+
+        <!--
+            Apache common-lang3 (for Java 6.0+)
+            URL : http://repo1.maven.org/maven2/org/apache/commons/commons-lang3/
+            Latest Version : 3.4
+            Date : 03-Apr-2015
+        -->
+        <apache-commons-lang3-version>3.4</apache-commons-lang3-version>
+
+        <!--
+            Google guava
+            URL : http://repo1.maven.org/maven2/com/google/guava/guava/
+            Latest Version : 18.0
+            Date : 25-Aug-2014
+        -->
+        <google-guava-version>18.0</google-guava-version>
+
+        <!-- =========== -->
+        <!-- = JAVA EE = -->
+        <!-- =========== -->
+
+        <!--
+            Jetty
+            URL : http://central.maven.org/maven2/org/eclipse/jetty/jetty-maven-plugin/
+            VERSION : 9.2.9
+            DATE :
+        -->
+        <jetty-version>9.2.9.v20150224</jetty-version>
+
+
     </properties>
 
     <dependencies>
@@ -46,7 +80,17 @@
             <version>${slf4j-version}</version>
             <scope>compile</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${apache-commons-lang3-version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${google-guava-version}</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
